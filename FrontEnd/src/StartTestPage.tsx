@@ -124,7 +124,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 												onChange={(e) => handleSub1Change(exKey, e.target.value)}
 												className="w-4 h-4"
 											/>
-											<span className="font-medium">{letter}</span>
+											<span className="font-medium"><b>{letter}.</b></span>
 											<span className="text-gray-600">{opt}</span>
 											</label>
 									)

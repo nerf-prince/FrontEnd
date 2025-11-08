@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getSubjectId } from './utils/subjectLoader'
 
 interface SubjectData {
   _id?: { $oid: string }
@@ -7,11 +9,8 @@ interface SubjectData {
   [key: string]: any
 }
 
-interface SubjectsListProps {
-  onNavigateToTestDetail: (subject: SubjectData) => void
-}
-
-function SubjectsList({ onNavigateToTestDetail }: SubjectsListProps) {
+function SubjectsList() {
+  const navigate = useNavigate()
   const [subjects, setSubjects] = useState<SubjectData[]>([])
   const [filteredSubjects, setFilteredSubjects] = useState<SubjectData[]>([])
   const [loading, setLoading] = useState(true)
@@ -19,6 +18,11 @@ function SubjectsList({ onNavigateToTestDetail }: SubjectsListProps) {
   
   const [selectedYear, setSelectedYear] = useState<string>('Toate')
   const [selectedSession, setSelectedSession] = useState<string>('Toate')
+
+  const handleSubjectClick = (subject: SubjectData) => {
+    const id = getSubjectId(subject)
+    navigate(`/test/${id}`)
+  }
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -165,7 +169,7 @@ function SubjectsList({ onNavigateToTestDetail }: SubjectsListProps) {
 
             <div className="mt-6 pt-4 border-t border-gray-100">
               <button
-                onClick={() => onNavigateToTestDetail(subject)}
+                onClick={() => handleSubjectClick(subject)}
                 className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
               >
                 Vezi subiectul →

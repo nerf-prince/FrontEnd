@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import Header from './Header'
-import StartTestPage from './StartTestPage'
 import type { SubjectData } from './interfaces/SubjectData'
 
 
@@ -8,15 +6,14 @@ interface TestDetailPageProps {
   subject: SubjectData
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
+  onStartTest?: (subject: SubjectData) => void
 }
 
 
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
-  const [isStartingTest, setIsStartingTest] = useState(false)
-
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
   const handleStartTest = () => {
-    // Open the StartTestPage view
-    setIsStartingTest(true)
+    if (onStartTest) onStartTest(subject)
+    else console.warn('onStartTest handler not provided')
   }
 
   const handlePracticeTest = () => {
@@ -34,7 +31,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
           <div className="ml-4 space-y-1">
             {options.map((option: string, idx: number) => (
               <p key={idx} className="text-sm text-gray-600">
-                {String.fromCharCode(97 + idx)} {option}
+                <b>{String.fromCharCode(97 + idx)}.</b> {option}
               </p>
             ))}
           </div>
@@ -116,19 +113,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
     )
   }
 
-  // If user started the test, render the StartTestPage
-  if (isStartingTest) {
-    return (
-      <StartTestPage
-        subject={subject}
-        onNavigateBack={() => setIsStartingTest(false)}
-        onSubmit={(answers) => {
-          console.log('Submitted answers', answers)
-          setIsStartingTest(false)
-        }}
-      />
-    )
-  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">

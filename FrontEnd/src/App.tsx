@@ -1,70 +1,54 @@
-import { useState } from 'react'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
-import TestDetailPage from './TestDetailPage'
-
-type Page = 'landing' | 'login' | 'testDetail' | 'register'
-
-interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
-  [key: string]: any
-}
+import TestDetailRoute from './TestDetailRoute'
+import StartTestRoute from './StartTestRoute'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('landing')
-  const [selectedSubject, setSelectedSubject] = useState<SubjectData | null>(null)
+  const navigate = useNavigate()
 
-  const navigateToLogin = () => {
-    setCurrentPage('login')
-  }
-
-  const navigateToRegister = () => {
-    setCurrentPage('register')
-  }
-
-  const navigateToLanding = () => {
-    setCurrentPage('landing')
-    setSelectedSubject(null)
-  }
-
-  const navigateToTestDetail = (subject: SubjectData) => {
-    setSelectedSubject(subject)
-    setCurrentPage('testDetail')
-  }
+  const navigateToLogin = () => navigate('/login')
+  const navigateToRegister = () => navigate('/register')
+  const navigateToLanding = () => navigate('/')
 
   return (
-    <>
-      {currentPage === 'landing' && (
-        <LandingPage
-          onNavigateToLogin={navigateToLogin}
-          onNavigateToTestDetail={navigateToTestDetail}
-        />
-      )}
-      {currentPage === 'login' && (
-        <LoginPage 
-          onNavigateBack={navigateToLanding}
-          onNavigateToRegister={navigateToRegister}
-          onNavigateToLanding={navigateToLanding}
-        />
-      )}
-      {currentPage === 'register' && (
-        <RegisterPage 
-          onNavigateBack={navigateToLanding}
-          onNavigateToLogin={navigateToLogin}
-          onNavigateToLanding={navigateToLanding}
-        />
-      )}
-      {currentPage === 'testDetail' && selectedSubject && (
-        <TestDetailPage
-          subject={selectedSubject}
-          onNavigateBack={navigateToLanding}
-          onNavigateToLanding={navigateToLanding}
-        />
-      )}
-    </>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <LandingPage onNavigateToLogin={navigateToLogin} />
+        }
+      />
+
+      <Route
+        path="/login"
+        element={
+          <LoginPage
+            onNavigateBack={navigateToLanding}
+            onNavigateToRegister={navigateToRegister}
+            onNavigateToLanding={navigateToLanding}
+          />
+        }
+      />
+
+      <Route
+        path="/register"
+        element={
+          <RegisterPage
+            onNavigateBack={navigateToLanding}
+            onNavigateToLogin={navigateToLogin}
+            onNavigateToLanding={navigateToLanding}
+          />
+        }
+      />
+
+      <Route path="/test/:id" element={<TestDetailRoute />} />
+      <Route path="/start/:id" element={<StartTestRoute />} />
+
+      {/* Fallback: redirect unknown paths to landing */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
