@@ -1,14 +1,6 @@
 import Header from './Header'
+import type { SubjectData } from './interfaces/SubjectData'
 
-interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
-  Sub1?: any
-  Sub2?: any
-  Sub3?: any
-  [key: string]: any
-}
 
 interface TestDetailPageProps {
   subject: SubjectData
@@ -36,7 +28,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
           <div className="ml-4 space-y-1">
             {options.map((option: string, idx: number) => (
               <p key={idx} className="text-sm text-gray-600">
-                {String.fromCharCode(97 + idx)}) {option}
+                {String.fromCharCode(97 + idx)} {option}
               </p>
             ))}
           </div>
