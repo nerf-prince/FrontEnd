@@ -13,9 +13,9 @@ interface SubjectData {
 interface TestDetailPageProps {
   subject: SubjectData
   onNavigateBack: () => void
+  onNavigateToLanding?: () => void
 }
-
-function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
   const handleStartTest = () => {
     // TODO: Implement start test functionality
     console.log('Start test clicked')
@@ -86,7 +86,12 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
     const subjectData = subject[subjectKey]
     if (!subjectData || typeof subjectData !== 'object') return null
 
-    const exercises = Object.keys(subjectData).filter(key => key.startsWith('Ex'))
+    // Check if the subject uses the new array structure (Ex array) or old structure (Ex1, Ex2, etc.)
+    const exercises = subjectData.Ex && Array.isArray(subjectData.Ex) 
+      ? subjectData.Ex 
+      : Object.keys(subjectData).filter(key => key.startsWith('Ex')).map(key => subjectData[key])
+
+    if (!exercises || exercises.length === 0) return null
 
     // Convert Sub1, Sub2, Sub3 to "Subiectul 1", "Subiectul 2", "Subiectul 3"
     const subjectNumber = subjectKey.replace('Sub', '')
@@ -96,15 +101,15 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
       <div key={subjectKey} className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">{subjectTitle}</h2>
         <div className="space-y-4">
-          {exercises.map(exerciseKey => {
-            // Convert Ex1, Ex2, Ex3, etc. to "Exercițiul 1", "Exercițiul 2", etc.
-            const exerciseNumber = exerciseKey.replace('Ex', '')
+          {exercises.map((exerciseData: any, index: number) => {
+            // Exercise number is index + 1
+            const exerciseNumber = index + 1
             const exerciseTitle = `Exercițiul ${exerciseNumber}`
 
             return (
-              <div key={exerciseKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+              <div key={`ex-${index}`} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseTitle}</h3>
-                {renderExercise(subjectData[exerciseKey], exerciseKey)}
+                {renderExercise(exerciseData, `ex-${index}`)}
               </div>
             )
           })}
@@ -115,7 +120,7 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <Header showLoginButton={false} />
+      <Header showLoginButton={false} onNavigateToLanding={onNavigateToLanding} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
