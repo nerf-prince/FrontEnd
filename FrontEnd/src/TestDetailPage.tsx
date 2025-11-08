@@ -48,12 +48,14 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
       return (
         <div key={exerciseKey} className="mb-6">
+          {exerciseData.Sentence && (
+            <p className="text-base text-gray-700 mb-3">{exerciseData.Sentence}</p>
+          )}
           {exerciseData.Code && (
             <pre className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto">
               <code>{exerciseData.Code}</code>
             </pre>
           )}
-          <p className="text-base text-gray-700 mb-3">{exerciseData.Sentence}</p>
           <div className="ml-4 space-y-2">
             {exerciseData.a && (
               <p className="text-sm text-gray-600">{exerciseData.a.Sentence}</p>
@@ -94,12 +96,18 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
       <div key={subjectKey} className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">{subjectTitle}</h2>
         <div className="space-y-4">
-          {exercises.map(exerciseKey => (
-            <div key={exerciseKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseKey}</h3>
-              {renderExercise(subjectData[exerciseKey], exerciseKey)}
-            </div>
-          ))}
+          {exercises.map(exerciseKey => {
+            // Convert Ex1, Ex2, Ex3, etc. to "Exercițiul 1", "Exercițiul 2", etc.
+            const exerciseNumber = exerciseKey.replace('Ex', '')
+            const exerciseTitle = `Exercițiul ${exerciseNumber}`
+
+            return (
+              <div key={exerciseKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseTitle}</h3>
+                {renderExercise(subjectData[exerciseKey], exerciseKey)}
+              </div>
+            )
+          })}
         </div>
       </div>
     )

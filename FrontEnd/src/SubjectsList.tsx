@@ -145,23 +145,10 @@ function SubjectsList({ onNavigateToTestDetail }: SubjectsListProps) {
             key={subject._id?.$oid || subject.AnScolar + subject.Sesiune}
             className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 cursor-pointer hover:scale-[1.01] transform transition-all duration-300"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            <div className="mb-4">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full inline-block">
                 BAC
               </div>
-              <svg 
-                className="w-5 h-5 text-gray-400" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M9 5l7 7-7 7" 
-                />
-              </svg>
             </div>
             
             <div className="space-y-3">
