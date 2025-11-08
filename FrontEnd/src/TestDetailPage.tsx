@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import Header from './Header'
+import StartTestPage from './StartTestPage'
 import type { SubjectData } from './interfaces/SubjectData'
 
 
@@ -7,10 +9,11 @@ interface TestDetailPageProps {
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
 }
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
+
+function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
   const handleStartTest = () => {
-    // TODO: Implement start test functionality
-    console.log('Start test clicked')
+    // Open the StartTestPage view
+    setIsStartingTest(true)
   }
 
   const handlePracticeTest = () => {
@@ -110,6 +113,20 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
     )
   }
 
+  // If user started the test, render the StartTestPage
+  if (isStartingTest) {
+    return (
+      <StartTestPage
+        subject={subject}
+        onNavigateBack={() => setIsStartingTest(false)}
+        onSubmit={(answers) => {
+          console.log('Submitted answers', answers)
+          setIsStartingTest(false)
+        }}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <Header showLoginButton={false} onNavigateToLanding={onNavigateToLanding} />
@@ -166,5 +183,8 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
   )
 }
 
+
 export default TestDetailPage
+
+
 
