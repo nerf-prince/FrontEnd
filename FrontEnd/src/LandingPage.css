@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Warp&display=swap');
+
+* {
+  font-family: 'Tilt Warp', sans-serif;
+}
+
+.landing-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  padding: 15px 0;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.header-login-button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 10px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header-login-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.header-login-button:active {
+  transform: translateY(0);
+}
+
+.landing-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #009999, #003333);
+}
+
+.landing-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  color: white;
+  padding: 60px 20px 40px;
+  box-sizing: border-box;
+}
+
+.landing-title {
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 72px;
+  font-weight: bold;
+  margin: 0 0 40px 0;
+  color: white;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-container {
+  background: linear-gradient(to bottom, rgba(0, 153, 153, 0.4), rgba(0, 51, 51, 0.4));
+  border-radius: 30px;
+  padding: 50px 60px;
+  margin: 0 auto 60px;
+  max-width: 900px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.hero-heading {
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 42px;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 30px 0;
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 18px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 35px 0;
+  text-align: center;
+}
+
+.signup-button {
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 16px 50px;
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.signup-button:hover {
+  background-color: #7c3aed;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.signup-button:active {
+  transform: translateY(-1px);
+}
+
+.landing-subtitle {
+  font-size: 28px;
+  font-weight: 300;
+  margin: 0 0 20px 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.landing-description {
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 50px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.landing-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 80px;
+  flex-wrap: wrap;
+}
+
+.cta-button {
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 18px 50px;
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+  background-color: #7c3aed;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button:active {
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 25px;
+  padding: 16px 48px;
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secondary-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-button:active {
+  transform: translateY(-1px);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 60px;
+}
+
+.feature-card {
+  background: linear-gradient(to bottom, rgba(0, 153, 153, 0.7), rgba(0, 51, 51, 0.7));
+  border-radius: 20px;
+  padding: 40px 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(to bottom, rgba(0, 153, 153, 0.85), rgba(0, 51, 51, 0.85));
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-family: 'Tilt Warp', sans-serif;
+  font-size: 24px;
+  margin: 0 0 15px 0;
+  color: white;
+}
+
+.feature-card p {
+  font-size: 16px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 20px;
+  }
+
+  .header-logo {
+    font-size: 20px;
+  }
+
+  .header-login-button {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  .landing-content {
+    padding: 40px 20px 20px;
+  }
+
+  .landing-title {
+    font-size: 48px;
+  }
+
+  .hero-container {
+    padding: 35px 30px;
+    margin: 0 auto 40px;
+  }
+
+  .hero-heading {
+    font-size: 28px;
+  }
+
+  .hero-description {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .signup-button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .landing-subtitle {
+    font-size: 22px;
+  }
+
+  .landing-description {
+    font-size: 16px;
+  }
+
+  .landing-buttons {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 60px;
+  }
+
+  .cta-button,
+  .secondary-button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
