@@ -14,6 +14,7 @@ interface StartTestPageProps {
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
 
 function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps) {
+	
 	const [formState, setFormState] = useState<Record<string, any>>({})
 
 	const handleSub1Change = (exerciseKey: string, value: string) => {
