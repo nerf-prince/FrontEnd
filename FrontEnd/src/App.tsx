@@ -20,6 +20,10 @@ function App() {
     setCurrentPage('login')
   }
 
+  const navigateToRegister = () => {
+    setCurrentPage('register')
+  }
+
   const navigateToLanding = () => {
     setCurrentPage('landing')
     setSelectedSubject(null)
@@ -39,7 +43,16 @@ function App() {
         />
       )}
       {currentPage === 'login' && (
-        <LoginPage onNavigateBack={navigateToLanding} />
+        <LoginPage 
+          onNavigateBack={navigateToLanding}
+          onNavigateToRegister={navigateToRegister}
+        />
+      )}
+      {currentPage === 'register' && (
+        <RegisterPage 
+          onNavigateBack={navigateToLanding}
+          onNavigateToLogin={navigateToLogin}
+        />
       )}
       {currentPage === 'testDetail' && selectedSubject && (
         <TestDetailPage

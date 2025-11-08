@@ -3,9 +3,10 @@ import Header from './Header'
 
 interface LoginPageProps {
   onNavigateBack: () => void
+  onNavigateToRegister: () => void
 }
 
-function LoginPage({ onNavigateBack }: LoginPageProps) {
+function LoginPage({ onNavigateBack, onNavigateToRegister }: LoginPageProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
@@ -20,9 +21,9 @@ function LoginPage({ onNavigateBack }: LoginPageProps) {
 
       {/* Login Card - Centered */}
       <div className="flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-md p-8 lg:p-10 transform hover:scale-[1.01] transition-transform duration-300">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-md p-8 lg:p-10 transform transition-transform duration-300">
         <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
-          SmartLearn
+          InfoBac
         </h1>
 
         <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-5">
@@ -73,7 +74,7 @@ function LoginPage({ onNavigateBack }: LoginPageProps) {
 
           <button
             type="submit"
-            className="w-full mt-6 px-6 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200"
+            className="w-full mt-6 px-6 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 transform transition-all duration-400"
           >
             CONECTEAZĂ-TE
           </button>
@@ -81,7 +82,10 @@ function LoginPage({ onNavigateBack }: LoginPageProps) {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Nu ai cont?{' '}
-          <button className="font-medium text-blue-600 hover:text-blue-700 transition-colors">
+          <button 
+            onClick={onNavigateToRegister}
+            className="font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          >
             Înregistrează-te
           </button>
         </p>
