@@ -17,6 +17,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 	
 	const [formState, setFormState] = useState<Record<string, any>>({})
 
+
 	const handleSub1Change = (exerciseKey: string, value: string) => {
 		setFormState(prev => ({
 			...prev,
@@ -54,6 +55,48 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 
 	const renderSub1 = (sub: any) => {
 		if (!sub) return null
+
+		// Support two data shapes:
+		// 1) keyed exercises: { Ex1: {...}, Ex2: {...} }
+		// 2) array under 'Ex': { Ex: [ {...}, {...} ] }
+		if (Array.isArray(sub.Ex)) {
+			return (
+				<div className="space-y-6">
+					{sub.Ex.map((item: any, idx: number) => {
+						const exKey = `Ex${idx + 1}`
+						const ex = item
+						const options = ex?.Options ? String(ex.Options).split('$') : []
+						return (
+							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
+								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+
+								<div className="ml-4 space-y-2">
+									{options.map((opt: string, optIdx: number) => {
+										const letter = String.fromCharCode(97 + optIdx)
+										return (
+											<label key={optIdx} className="flex items-center gap-3 text-sm text-gray-700">
+												<input
+													type="radio"
+													name={`sub1-${exKey}`}
+													value={letter}
+													checked={formState.Sub1?.[exKey] === letter}
+													onChange={(e) => handleSub1Change(exKey, e.target.value)}
+													className="w-4 h-4"
+												/>
+												<span className="font-medium">{letter}</span>
+												<span className="text-gray-600">{opt}</span>
+											</label>
+										)
+									})}
+								</div>
+							</div>
+						)
+					})}
+				</div>
+			)
+		}
+
 		const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
 		return (
 			<div className="space-y-6">
@@ -83,7 +126,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 											/>
 											<span className="font-medium">{letter}</span>
 											<span className="text-gray-600">{opt}</span>
-										</label>
+											</label>
 									)
 								})}
 							</div>
@@ -96,6 +139,54 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 
 	const renderSub2or3 = (subKey: string, sub: any) => {
 		if (!sub) return null
+
+		// Support array under 'Ex' or keyed Ex1/Ex2
+		if (Array.isArray(sub.Ex)) {
+			return (
+				<div className="space-y-6">
+					{sub.Ex.map((item: any, idx: number) => {
+						const exKey = `Ex${idx + 1}`
+						const ex = item
+						if (!ex) return null
+						const hasParts = ex.a || ex.b || ex.c || ex.d
+						return (
+							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
+								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+								{ex.Code && (
+									<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.Code}</pre>
+								)}
+								<div className="ml-4 space-y-3">
+									{hasParts ? (
+										['a', 'b', 'c', 'd'].map(part =>
+											ex[part] ? (
+											<div key={part}>
+												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+												<input
+													type="text"
+													value={formState[subKey]?.[exKey]?.[part] || ''}
+													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
+													className="w-full px-3 py-2 border rounded-lg"
+												/>
+											</div>
+										) : null
+										)
+									) : (
+									<textarea
+										rows={3}
+										value={formState[subKey]?.[exKey] || ''}
+										onChange={(e) => handleTextChange(subKey, exKey, null, e.target.value)}
+										className="w-full px-3 py-2 border rounded-lg"
+									/>
+									)}
+								</div>
+							</div>
+						)
+					})}
+				</div>
+			)
+		}
+
 		const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
 		return (
 			<div className="space-y-6">
@@ -118,25 +209,25 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 								{hasParts ? (
 									['a', 'b', 'c', 'd'].map(part =>
 										ex[part] ? (
-											<div key={part}>
-												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-												<input
-													type="text"
+										<div key={part}>
+											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+											<input
+												type="text"
 													value={formState[subKey]?.[exKey]?.[part] || ''}
 													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
 													className="w-full px-3 py-2 border rounded-lg"
 												/>
 											</div>
 										) : null
-									)
-								) : (
+										)
+									) : (
 									<textarea
 										rows={3}
 										value={formState[subKey]?.[exKey] || ''}
 										onChange={(e) => handleTextChange(subKey, exKey, null, e.target.value)}
 										className="w-full px-3 py-2 border rounded-lg"
 									/>
-								)}
+									)}
 							</div>
 						</div>
 					)

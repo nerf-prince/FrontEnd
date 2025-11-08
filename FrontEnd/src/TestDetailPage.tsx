@@ -8,11 +8,10 @@ interface TestDetailPageProps {
   subject: SubjectData
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
-  onNavigateToLanding?: () => void
 }
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
 
-function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
+
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
   const [isStartingTest, setIsStartingTest] = useState(false)
 
   const handleStartTest = () => {
@@ -186,6 +185,7 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
     </div>
   )
 }
+
 
 
 export default TestDetailPage
