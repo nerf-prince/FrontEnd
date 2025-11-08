@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 
 interface SubjectData {
+  _id?: { $oid: string }
   AnScolar: string
   Sesiune: string
   [key: string]: any
 }
 
-function SubjectsList() {
+interface SubjectsListProps {
+  onNavigateToTestDetail: (subject: SubjectData) => void
+}
+
+function SubjectsList({ onNavigateToTestDetail }: SubjectsListProps) {
   const [subjects, setSubjects] = useState<SubjectData[]>([])
   const [filteredSubjects, setFilteredSubjects] = useState<SubjectData[]>([])
   const [loading, setLoading] = useState(true)
@@ -172,7 +177,10 @@ function SubjectsList() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <button className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              <button
+                onClick={() => onNavigateToTestDetail(subject)}
+                className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              >
                 Vezi subiectul →
               </button>
             </div>

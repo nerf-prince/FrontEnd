@@ -1,12 +1,20 @@
 import { useState } from 'react'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
-import RegisterPage from './RegisterPage'
+import TestDetailPage from './TestDetailPage'
 
-type Page = 'landing' | 'login' | 'register'
+type Page = 'landing' | 'login' | 'testDetail'
+
+interface SubjectData {
+  _id?: { $oid: string }
+  AnScolar: string
+  Sesiune: string
+  [key: string]: any
+}
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing')
+  const [selectedSubject, setSelectedSubject] = useState<SubjectData | null>(null)
 
   const navigateToLogin = () => {
     setCurrentPage('login')
@@ -18,12 +26,21 @@ function App() {
 
   const navigateToLanding = () => {
     setCurrentPage('landing')
+    setSelectedSubject(null)
+  }
+
+  const navigateToTestDetail = (subject: SubjectData) => {
+    setSelectedSubject(subject)
+    setCurrentPage('testDetail')
   }
 
   return (
     <>
       {currentPage === 'landing' && (
-        <LandingPage onNavigateToLogin={navigateToLogin} />
+        <LandingPage
+          onNavigateToLogin={navigateToLogin}
+          onNavigateToTestDetail={navigateToTestDetail}
+        />
       )}
       {currentPage === 'login' && (
         <LoginPage 
@@ -35,6 +52,12 @@ function App() {
         <RegisterPage 
           onNavigateBack={navigateToLanding}
           onNavigateToLogin={navigateToLogin}
+        />
+      )}
+      {currentPage === 'testDetail' && selectedSubject && (
+        <TestDetailPage
+          subject={selectedSubject}
+          onNavigateBack={navigateToLanding}
         />
       )}
     </>
