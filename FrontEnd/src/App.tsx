@@ -47,18 +47,21 @@ function App() {
         <LoginPage 
           onNavigateBack={navigateToLanding}
           onNavigateToRegister={navigateToRegister}
+          onNavigateToLanding={navigateToLanding}
         />
       )}
       {currentPage === 'register' && (
         <RegisterPage 
           onNavigateBack={navigateToLanding}
           onNavigateToLogin={navigateToLogin}
+          onNavigateToLanding={navigateToLanding}
         />
       )}
       {currentPage === 'testDetail' && selectedSubject && (
         <TestDetailPage
           subject={selectedSubject}
           onNavigateBack={navigateToLanding}
+          onNavigateToLanding={navigateToLanding}
         />
       )}
     </>
