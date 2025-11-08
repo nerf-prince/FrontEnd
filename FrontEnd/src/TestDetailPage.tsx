@@ -8,9 +8,13 @@ interface TestDetailPageProps {
   subject: SubjectData
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
+  onNavigateToLanding?: () => void
 }
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
 
 function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
+  const [isStartingTest, setIsStartingTest] = useState(false)
+
   const handleStartTest = () => {
     // Open the StartTestPage view
     setIsStartingTest(true)
