@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 
@@ -15,7 +15,84 @@ interface StartTestPageProps {
 
 function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps) {
 	
-	const [formState, setFormState] = useState<Record<string, any>>({})
+	const getStorageKey = () => {
+		const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+		return `test-progress-${subjectId}`
+	}
+
+	const getTimerKey = () => {
+		const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+		return `test-timer-${subjectId}`
+	}
+
+	const [formState, setFormState] = useState<Record<string, any>>(() => {
+		// Restore from localStorage on mount
+		const storageKey = getStorageKey()
+		const saved = localStorage.getItem(storageKey)
+		return saved ? JSON.parse(saved) : {}
+	})
+
+	const [timeRemaining, setTimeRemaining] = useState<number>(() => {
+		// Restore timer from localStorage or start with 3 hours (10800 seconds)
+		const timerKey = getTimerKey()
+		const savedTime = localStorage.getItem(timerKey)
+		if (savedTime) {
+			const savedData = JSON.parse(savedTime)
+			const elapsed = Math.floor((Date.now() - savedData.startTime) / 1000)
+			const remaining = savedData.duration - elapsed
+			return remaining > 0 ? remaining : 0
+		}
+		// Initialize with 3 hours
+		const duration = 3 * 60 * 60 // 10800 seconds
+		localStorage.setItem(timerKey, JSON.stringify({ startTime: Date.now(), duration }))
+		return duration
+	})
+
+	// Save to localStorage whenever formState changes
+	useEffect(() => {
+		const storageKey = getStorageKey()
+		localStorage.setItem(storageKey, JSON.stringify(formState))
+	}, [formState])
+
+	// Timer countdown
+	useEffect(() => {
+		if (timeRemaining <= 0) {
+			// Auto-submit when time runs out
+			handleAutoSubmit()
+			return
+		}
+
+		const interval = setInterval(() => {
+			setTimeRemaining(prev => {
+				const newTime = prev - 1
+				if (newTime <= 0) {
+					clearInterval(interval)
+					return 0
+				}
+				return newTime
+			})
+		}, 1000)
+
+		return () => clearInterval(interval)
+	}, [timeRemaining])
+
+	const handleAutoSubmit = () => {
+		const answers: any = { ...formState }
+		const storageKey = getStorageKey()
+		const timerKey = getTimerKey()
+		localStorage.removeItem(storageKey)
+		localStorage.removeItem(timerKey)
+
+		if (onSubmit) onSubmit(answers)
+		else console.log('Auto-submitted answers (time expired)', answers)
+	}
+
+	const formatTime = (seconds: number) => {
+		const hours = Math.floor(seconds / 3600)
+		const minutes = Math.floor((seconds % 3600) / 60)
+		const secs = seconds % 60
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+	}
 
 
 	const handleSub1Change = (exerciseKey: string, value: string) => {
@@ -47,6 +124,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 	const submit = (e: React.FormEvent) => {
 		e.preventDefault()
 		const answers: any = { ...formState }
+
+		// Clear localStorage after submission
+		const storageKey = getStorageKey()
+		const timerKey = getTimerKey()
+		localStorage.removeItem(storageKey)
+		localStorage.removeItem(timerKey)
 
 		// Optionally map into the project's `UserAnswer` shape if desired.
 		if (onSubmit) onSubmit(answers)
@@ -84,7 +167,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 													onChange={(e) => handleSub1Change(exKey, e.target.value)}
 													className="w-4 h-4"
 												/>
-												<span className="font-medium">{letter}</span>
+												<span className="font-bold">{letter}.</span>
 												<span className="text-gray-600">{opt}</span>
 											</label>
 										)
@@ -124,7 +207,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 												onChange={(e) => handleSub1Change(exKey, e.target.value)}
 												className="w-4 h-4"
 											/>
-											<span className="font-medium"><b>{letter}.</b></span>
+											<span className="font-bold">{letter}.</span>
 											<span className="text-gray-600">{opt}</span>
 											</label>
 									)
@@ -162,12 +245,21 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 											ex[part] ? (
 											<div key={part}>
 												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-												<input
-													type="text"
-													value={formState[subKey]?.[exKey]?.[part] || ''}
-													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
-													className="w-full px-3 py-2 border rounded-lg"
-												/>
+												{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
+													<textarea
+														rows={3}
+														value={formState[subKey]?.[exKey]?.[part] || ''}
+														onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
+														className="w-full px-3 py-2 border rounded-lg"
+													/>
+												) : (
+													<input
+														type="text"
+														value={formState[subKey]?.[exKey]?.[part] || ''}
+														onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
+														className="w-full px-3 py-2 border rounded-lg"
+													/>
+												)}
 											</div>
 										) : null
 										)
@@ -211,12 +303,21 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 										ex[part] ? (
 										<div key={part}>
 											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-											<input
-												type="text"
+											{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
+												<textarea
+													rows={3}
 													value={formState[subKey]?.[exKey]?.[part] || ''}
 													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
 													className="w-full px-3 py-2 border rounded-lg"
 												/>
+											) : (
+												<input
+													type="text"
+													value={formState[subKey]?.[exKey]?.[part] || ''}
+													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
+													className="w-full px-3 py-2 border rounded-lg"
+												/>
+											)}
 											</div>
 										) : null
 										)
@@ -255,19 +356,30 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 					Completează testul — {subject.AnScolar} · {subject.Sesiune}
 				</h1>
 
+				{/* Timer */}
+				<div className="mb-8 flex justify-center">
+					<div className={`px-6 py-3 rounded-xl font-bold text-2xl ${
+						timeRemaining < 600 ? 'bg-red-100 text-red-700' : 
+						timeRemaining < 1800 ? 'bg-yellow-100 text-yellow-700' : 
+						'bg-blue-100 text-blue-700'
+					}`}>
+						⏱️ Timp rămas: {formatTime(timeRemaining)}
+					</div>
+				</div>
+
 				<form onSubmit={submit} className="space-y-8">
 					<section>
-						<h2 className="text-2xl font-bold mb-4">Subiectul 1 (alegere multiple)</h2>
+						<h2 className="text-2xl font-bold mb-4">Subiectul 1</h2>
 						{renderSub1(subject.Sub1)}
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-bold mb-4">Subiectul 2 (completare)</h2>
+						<h2 className="text-2xl font-bold mb-4">Subiectul 2</h2>
 						{renderSub2or3('Sub2', subject.Sub2)}
 					</section>
 
 					<section>
-						<h2 className="text-2xl font-bold mb-4">Subiectul 3 (completare)</h2>
+						<h2 className="text-2xl font-bold mb-4">Subiectul 3</h2>
 						{renderSub2or3('Sub3', subject.Sub3)}
 					</section>
 
