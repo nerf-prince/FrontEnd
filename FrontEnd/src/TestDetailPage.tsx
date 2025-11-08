@@ -150,13 +150,13 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
         <div className="flex flex-col sm:flex-row gap-4 mb-10">
           <button
             onClick={handleStartTest}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform transition-all duration-300"
           >
             Start Test
           </button>
           <button
             onClick={handlePracticeTest}
-            className="flex-1 bg-white text-blue-600 font-semibold py-4 px-6 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-[1.02] transition-all duration-300"
+            className="flex-1 bg-white text-blue-600 font-semibold py-4 px-6 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transform transition-all duration-300"
           >
             Exersează pe test
           </button>
