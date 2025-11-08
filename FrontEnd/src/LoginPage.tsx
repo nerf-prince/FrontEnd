@@ -4,9 +4,10 @@ import Header from './Header'
 interface LoginPageProps {
   onNavigateBack: () => void
   onNavigateToRegister: () => void
+  onNavigateToLanding: () => void
 }
 
-function LoginPage({ onNavigateBack, onNavigateToRegister }: LoginPageProps) {
+function LoginPage({ onNavigateBack, onNavigateToRegister, onNavigateToLanding }: LoginPageProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
@@ -17,7 +18,7 @@ function LoginPage({ onNavigateBack, onNavigateToRegister }: LoginPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <Header showBackButton onNavigateBack={onNavigateBack} />
+      <Header showBackButton onNavigateBack={onNavigateBack} onNavigateToLanding={onNavigateToLanding} />
 
       {/* Login Card - Centered */}
       <div className="flex items-center justify-center px-4 py-16">

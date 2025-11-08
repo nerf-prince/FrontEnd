@@ -13,9 +13,10 @@ interface SubjectData {
 interface TestDetailPageProps {
   subject: SubjectData
   onNavigateBack: () => void
+  onNavigateToLanding?: () => void
 }
 
-function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
   const handleStartTest = () => {
     // TODO: Implement start test functionality
     console.log('Start test clicked')
@@ -107,7 +108,7 @@ function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <Header showLoginButton={false} />
+      <Header showLoginButton={false} onNavigateToLanding={onNavigateToLanding} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
