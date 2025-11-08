@@ -1,165 +1,172 @@
-import Header from './Header'
+import React from 'react';
+
+interface ExerciseData {
+  Sentence?: string;
+  QuestionNumber?: number;
+  Answer?: string;
+  Options?: string;
+  Code?: string;
+  [key: string]: any;
+}
 
 interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
-  Sub1?: any
-  Sub2?: any
-  Sub3?: any
-  [key: string]: any
+  _id?: { $oid: string };
+  AnScolar: string;
+  Sesiune: string;
+  Sub1?: { [key: string]: ExerciseData };
+  Sub2?: { [key: string]: ExerciseData };
+  Sub3?: { [key: string]: ExerciseData };
+  [key: string]: any;
 }
 
 interface TestDetailPageProps {
-  subject: SubjectData
-  onNavigateBack: () => void
+  subject: SubjectData;
+  onNavigateBack: () => void;
 }
 
-function TestDetailPage({ subject, onNavigateBack }: TestDetailPageProps) {
-  const handleStartTest = () => {
-    // TODO: Implement start test functionality
-    console.log('Start test clicked')
-  }
+const TestDetailPage: React.FC<TestDetailPageProps> = ({ subject, onNavigateBack }) => {
 
-  const handlePracticeTest = () => {
-    // TODO: Implement practice test functionality
-    console.log('Practice test clicked')
-  }
-
-  const renderExercise = (exerciseData: any, exerciseKey: string) => {
-    // Handle Sub1 exercises with Options
-    if (exerciseData.Options) {
-      const options = exerciseData.Options.split('$')
-      return (
-        <div key={exerciseKey} className="mb-6">
-          <p className="text-base text-gray-700 mb-2">{exerciseData.Sentence}</p>
-          <div className="ml-4 space-y-1">
-            {options.map((option: string, idx: number) => (
-              <p key={idx} className="text-sm text-gray-600">
-                {String.fromCharCode(97 + idx)}) {option}
-              </p>
-            ))}
-          </div>
-        </div>
-      )
+  const getExerciseLabel = (exerciseKey: string): string => {
+    // Convert Ex1 -> Exercitiul 1, Ex2 -> Exercitiul 2, etc.
+    const match = exerciseKey.match(/Ex(\d+)/);
+    if (match) {
+      return `Exercitiul ${match[1]}`;
     }
+    return exerciseKey;
+  };
 
-    // Handle Sub2 exercises with subpoints (a, b, c, d)
-    if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
-      return (
-        <div key={exerciseKey} className="mb-6">
-          {exerciseData.Code && (
-            <pre className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto">
+  const renderExercise = (exerciseKey: string, exerciseData: ExerciseData) => {
+    return (
+      <div key={exerciseKey} className="mb-6 p-4 bg-white rounded-lg shadow">
+        <h3 className="text-xl font-semibold mb-3 text-blue-600">
+          {getExerciseLabel(exerciseKey)}
+        </h3>
+
+        {exerciseData.Sentence && (
+          <div className="mb-3">
+            <p className="text-gray-700">{exerciseData.Sentence}</p>
+          </div>
+        )}
+
+        {exerciseData.Code && (
+          <div className="mb-3">
+            <pre className="bg-gray-100 p-3 rounded overflow-x-auto">
               <code>{exerciseData.Code}</code>
             </pre>
-          )}
-          <p className="text-base text-gray-700 mb-3">{exerciseData.Sentence}</p>
-          <div className="ml-4 space-y-2">
-            {exerciseData.a && (
-              <p className="text-sm text-gray-600">{exerciseData.a.Sentence}</p>
-            )}
-            {exerciseData.b && (
-              <p className="text-sm text-gray-600">{exerciseData.b.Sentence}</p>
-            )}
-            {exerciseData.c && (
-              <p className="text-sm text-gray-600">{exerciseData.c.Sentence}</p>
-            )}
-            {exerciseData.d && (
-              <p className="text-sm text-gray-600">{exerciseData.d.Sentence}</p>
-            )}
           </div>
-        </div>
-      )
-    }
+        )}
 
-    // Handle simple exercises with just Sentence
-    return (
-      <div key={exerciseKey} className="mb-6">
-        <p className="text-base text-gray-700">{exerciseData.Sentence}</p>
+        {exerciseData.Options && (
+          <div className="mb-3">
+            <p className="font-semibold mb-2">Opțiuni:</p>
+            <ul className="list-disc list-inside">
+              {exerciseData.Options.split('$').map((option, idx) => (
+                <li key={idx} className="text-gray-700">
+                  {String.fromCharCode(97 + idx)}) {option}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Render sub-questions (a, b, c, d, etc.) */}
+        {Object.keys(exerciseData).map((key) => {
+          if (key.match(/^[a-z]$/)) {
+            const subQuestion = exerciseData[key] as any;
+            return (
+              <div key={key} className="ml-4 mb-2 p-3 bg-gray-50 rounded">
+                <p className="font-semibold text-gray-800">{key}) {subQuestion.Sentence}</p>
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
-    )
-  }
+    );
+  };
 
-  const renderSubject = (subjectKey: string) => {
-    const subjectData = subject[subjectKey]
-    if (!subjectData || typeof subjectData !== 'object') return null
-
-    const exercises = Object.keys(subjectData).filter(key => key.startsWith('Ex'))
-
-    // Convert Sub1, Sub2, Sub3 to "Subiectul 1", "Subiectul 2", "Subiectul 3"
-    const subjectNumber = subjectKey.replace('Sub', '')
-    const subjectTitle = `Subiectul ${subjectNumber}`
-
+  const renderSubject = (subjectKey: string, subjectData: { [key: string]: ExerciseData }) => {
+    const subjectNumber = subjectKey.replace('Sub', '');
     return (
       <div key={subjectKey} className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">{subjectTitle}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b-2 border-blue-500 pb-2">
+          Subiectul {subjectNumber}
+        </h2>
         <div className="space-y-4">
-          {exercises.map(exerciseKey => (
-            <div key={exerciseKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseKey}</h3>
-              {renderExercise(subjectData[exerciseKey], exerciseKey)}
-            </div>
-          ))}
+          {Object.keys(subjectData)
+            .sort((a, b) => {
+              // Sort Ex1, Ex2, Ex3 numerically
+              const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+              const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+              return numA - numB;
+            })
+            .map((exerciseKey) => renderExercise(exerciseKey, subjectData[exerciseKey]))}
         </div>
       </div>
-    )
+    );
+  };
+
+  if (!subject) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-gray-600 mb-4">Testul nu a fost găsit</p>
+          <button
+            onClick={onNavigateBack}
+            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+          >
+            Înapoi la listă
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <Header showLoginButton={false} />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back button */}
-        <button
-          onClick={onNavigateBack}
-          className="mb-6 flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
-        >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Înapoi la listă
-        </button>
-
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Bacul din anul școlar {subject.AnScolar}, sesiunea de {subject.Sesiune}
-        </h1>
-
-        {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-10">
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-6">
           <button
-            onClick={handleStartTest}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300"
+            onClick={onNavigateBack}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mb-4"
           >
-            Start Test
+            ← Înapoi
           </button>
-          <button
-            onClick={handlePracticeTest}
-            className="flex-1 bg-white text-blue-600 font-semibold py-4 px-6 rounded-xl border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-[1.02] transition-all duration-300"
-          >
-            Exersează pe test
-          </button>
+
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Test Bacalaureat - Informatică
+            </h1>
+            <div className="flex gap-4 text-gray-600 mb-4">
+              <span className="font-semibold">An școlar: {subject.AnScolar}</span>
+              <span className="font-semibold">Sesiune: {subject.Sesiune}</span>
+            </div>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => {/* TODO: Implement start test logic */}}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-colors duration-200 shadow-md"
+              >
+                Start Test
+              </button>
+              <button
+                onClick={() => {/* TODO: Implement practice mode logic */}}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold transition-colors duration-200 shadow-md"
+              >
+                Exersează pe test
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Subjects and exercises */}
-        <div className="space-y-8">
-          {['Sub1', 'Sub2', 'Sub3'].map(subKey => renderSubject(subKey))}
+        <div className="space-y-6">
+          {subject.Sub1 && renderSubject('Sub1', subject.Sub1)}
+          {subject.Sub2 && renderSubject('Sub2', subject.Sub2)}
+          {subject.Sub3 && renderSubject('Sub3', subject.Sub3)}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TestDetailPage
+export default TestDetailPage;
 
