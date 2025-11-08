@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
+import RegisterPage from './RegisterPage'
 import TestDetailPage from './TestDetailPage'
 
-type Page = 'landing' | 'login' | 'testDetail'
+type Page = 'landing' | 'login' | 'testDetail' | 'register'
 
 interface SubjectData {
   _id?: { $oid: string }
