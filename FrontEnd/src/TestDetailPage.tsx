@@ -78,20 +78,6 @@ export default function TestDetailPage({ subject, onNavigateBack, onNavigateToLa
               <p className="text-sm text-gray-600">{exerciseData.d.sentence}</p>
             )}
           </div>
-
-          {isSubject2Ex1 && exerciseData.code && (
-            <div className="mt-4">
-              <button
-                onClick={() => {
-                  const subjectId = getSubjectId(subject)
-                  navigate(`/interpretor/${subjectId}`)
-                }}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-              >
-                Deschide în Interpretor
-              </button>
-            </div>
-          )}
         </div>
       )
     }

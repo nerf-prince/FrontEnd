@@ -53,11 +53,19 @@ function InterpretorWithSubject() {
       try {
         setLoading(true)
         const loadedSubject = await loadSubjectById(id || '')
+        console.log('InterpretorWithSubject: Loaded subject:', loadedSubject)
         if (loadedSubject) {
           setSubject(loadedSubject)
           
-          // Extract code from Sub2 Ex1
-          const sub2Ex1Code = loadedSubject.Sub2?.Ex1?.Code || loadedSubject.Sub2?.Ex?.[0]?.Code || ''
+          console.log('InterpretorWithSubject: Sub2 structure:', loadedSubject.Sub2)
+          console.log('InterpretorWithSubject: sub2 structure (lowercase):', loadedSubject.sub2)
+          
+          // Extract code from Sub2 Ex1 (try both uppercase and lowercase)
+          const sub2Ex1Code = loadedSubject.Sub2?.Ex1?.Code || 
+                              loadedSubject.sub2?.ex1?.code ||
+                              loadedSubject.Sub2?.Ex?.[0]?.Code || 
+                              loadedSubject.sub2?.ex?.[0]?.code || ''
+          console.log('InterpretorWithSubject: Extracted code:', sub2Ex1Code)
           setCode(sub2Ex1Code)
           
           // Transpile initial code to C++
@@ -217,34 +225,50 @@ function InterpretorWithSubject() {
   }
 
   const renderRequirements = () => {
-    if (!subject?.Sub2) return null
+    // Try both uppercase and lowercase versions
+    const sub2 = subject?.Sub2 || subject?.sub2
+    if (!sub2) {
+      console.log('InterpretorWithSubject: No Sub2 or sub2 found in subject')
+      return null
+    }
 
-    const sub2 = subject.Sub2
-    const ex1 = sub2.Ex1 || (sub2.Ex && sub2.Ex[0])
+    const ex1 = sub2.Ex1 || sub2.ex1 || (sub2.Ex && sub2.Ex[0]) || (sub2.ex && sub2.ex[0])
+    
+    if (!ex1) {
+      console.log('InterpretorWithSubject: No Ex1 or ex1 found in sub2')
+      return null
+    }
 
-    if (!ex1) return null
+    console.log('InterpretorWithSubject: Rendering requirements for ex1:', ex1)
 
     return (
       <div className="space-y-3">
-        {/* Subpoints only */}
-        {ex1.a && (
-          <div>
-            <p className="font-semibold text-gray-900">a) {ex1.a.Sentence}</p>
+        {/* Main sentence if available */}
+        {(ex1.Sentence || ex1.sentence) && (
+          <div className="mb-4">
+            <p className="text-gray-700">{ex1.Sentence || ex1.sentence}</p>
           </div>
         )}
-        {ex1.b && (
+        
+        {/* Subpoints - try both uppercase and lowercase */}
+        {(ex1.a || ex1.A) && (
           <div>
-            <p className="font-semibold text-gray-900">b) {ex1.b.Sentence}</p>
+            <p className="font-semibold text-gray-900">a) {(ex1.a?.Sentence || ex1.a?.sentence || ex1.A?.Sentence || ex1.A?.sentence)}</p>
           </div>
         )}
-        {ex1.c && (
+        {(ex1.b || ex1.B) && (
           <div>
-            <p className="font-semibold text-gray-900">c) {ex1.c.Sentence}</p>
+            <p className="font-semibold text-gray-900">b) {(ex1.b?.Sentence || ex1.b?.sentence || ex1.B?.Sentence || ex1.B?.sentence)}</p>
           </div>
         )}
-        {ex1.d && (
+        {(ex1.c || ex1.C) && (
           <div>
-            <p className="font-semibold text-gray-900">d) {ex1.d.Sentence}</p>
+            <p className="font-semibold text-gray-900">c) {(ex1.c?.Sentence || ex1.c?.sentence || ex1.C?.Sentence || ex1.C?.sentence)}</p>
+          </div>
+        )}
+        {(ex1.d || ex1.D) && (
+          <div>
+            <p className="font-semibold text-gray-900">d) {(ex1.d?.Sentence || ex1.d?.sentence || ex1.D?.Sentence || ex1.D?.sentence)}</p>
           </div>
         )}
       </div>
