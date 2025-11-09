@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
+import { formatTextWithLineBreaks } from './utils/textFormatting'
 
 interface StartTestPageProps {
 	subject: SubjectData
@@ -185,7 +186,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 						return (
 							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{formatTextWithLineBreaks(ex.sentence)}</p>}
 
 								<div className="ml-4 space-y-2">
 									{options.map((opt: string, optIdx: number) => {
@@ -225,7 +226,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 					return (
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('ex', '')}`}</h3>
-							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{formatTextWithLineBreaks(ex.sentence)}</p>}
 
 							<div className="ml-4 space-y-2">
 								{options.map((opt: string, idx: number) => {
@@ -268,7 +269,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 						return (
 							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{formatTextWithLineBreaks(ex.sentence)}</p>}
 								{ex.code && (
 									<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.code}</pre>
 								)}
@@ -277,7 +278,9 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 										['a', 'b', 'c', 'd'].map(part =>
 											ex[part] ? (
 											<div key={part}>
-												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].sentence || ''}`}</label>
+												<label className="block text-sm font-medium text-gray-700 mb-1">
+													{`(${part}) `}{formatTextWithLineBreaks(ex[part].sentence)}
+												</label>
 												{subKey === 'sub2' && (part === 'c' || part === 'd') ? (
 													<textarea
 														rows={3}
@@ -325,7 +328,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 					return (
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('ex', '')}`}</h3>
-							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{formatTextWithLineBreaks(ex.sentence)}</p>}
 							{ex.code && (
 								<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.code}</pre>
 							)}
@@ -335,7 +338,9 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 									['a', 'b', 'c', 'd'].map(part =>
 										ex[part] ? (
 										<div key={part}>
-											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].sentence || ''}`}</label>
+											<label className="block text-sm font-medium text-gray-700 mb-1">
+												{`(${part}) `}{formatTextWithLineBreaks(ex[part].sentence)}
+											</label>
 											{subKey === 'sub2' && (part === 'c' || part === 'd') ? (
 												<textarea
 													rows={3}

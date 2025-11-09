@@ -1,5 +1,6 @@
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { formatTextWithLineBreaks } from './utils/textFormatting'
 
 
 interface TestDetailPageProps {
@@ -27,7 +28,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
       const options = exerciseData.options.split('$')
       return (
         <div key={exerciseKey} className="mb-6">
-          <p className="text-base text-gray-700 mb-2">{exerciseData.sentence}</p>
+          <p className="text-base text-gray-700 mb-2">{formatTextWithLineBreaks(exerciseData.sentence)}</p>
           <div className="ml-4 space-y-1">
             {options.map((option: string, idx: number) => (
               <p key={idx} className="text-sm text-gray-600">
@@ -44,7 +45,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
       return (
         <div key={exerciseKey} className="mb-6">
           {exerciseData.sentence && (
-            <p className="text-base text-gray-700 mb-3">{exerciseData.sentence}</p>
+            <p className="text-base text-gray-700 mb-3">{formatTextWithLineBreaks(exerciseData.sentence)}</p>
           )}
           {exerciseData.code && (
             <pre className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto">
@@ -53,16 +54,16 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
           )}
           <div className="ml-4 space-y-2">
             {exerciseData.a && (
-              <p className="text-sm text-gray-600">{exerciseData.a.sentence}</p>
+              <p className="text-sm text-gray-600">{formatTextWithLineBreaks(exerciseData.a.sentence)}</p>
             )}
             {exerciseData.b && (
-              <p className="text-sm text-gray-600">{exerciseData.b.sentence}</p>
+              <p className="text-sm text-gray-600">{formatTextWithLineBreaks(exerciseData.b.sentence)}</p>
             )}
             {exerciseData.c && (
-              <p className="text-sm text-gray-600">{exerciseData.c.sentence}</p>
+              <p className="text-sm text-gray-600">{formatTextWithLineBreaks(exerciseData.c.sentence)}</p>
             )}
             {exerciseData.d && (
-              <p className="text-sm text-gray-600">{exerciseData.d.sentence}</p>
+              <p className="text-sm text-gray-600">{formatTextWithLineBreaks(exerciseData.d.sentence)}</p>
             )}
           </div>
         </div>
@@ -72,7 +73,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     // Handle simple exercises with just sentence
     return (
       <div key={exerciseKey} className="mb-6">
-        <p className="text-base text-gray-700">{exerciseData.sentence}</p>
+        <p className="text-base text-gray-700">{formatTextWithLineBreaks(exerciseData.sentence)}</p>
       </div>
     )
   }
