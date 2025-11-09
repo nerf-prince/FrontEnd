@@ -257,6 +257,7 @@ export function parser(tokens) {
                     let DO_WHILENode = new whileNode(postFixCondition, thenNode)
                     instructions.push(new Node('DO-WHILE', DO_WHILENode))
                 }
+                break;
             case 'IDENTIFIER':
                 let varName = currToken.value
                 if (tokens.length > 0 && tokens[0].type === 'ASSIGN') {
@@ -323,9 +324,8 @@ export function parser(tokens) {
 
     const program = new Node('PROGRAM', null, instructions)
     console.dir(program, { depth: null })
-    if (program.children.length === 0 && tokens.length > 0) {
-        throw new Error("Programul nu contine instructiuni")
-    }
+    // Only throw error if we have tokens but couldn't parse any instructions
+    // Allow empty programs (e.g., for empty else blocks)
     return program
 }
 
@@ -463,11 +463,12 @@ function parseCatTimp(tokens) {
     eatNewlines(tokens);
     // Citim condiția până la token-ul "executa" sau o acoladă
     while (tokens.length > 0 && tokens[0].value !== 'executa' && tokens[0].type !== 'LBRACE') {
-        if ( tokens[0].value === '=' ) {
+        if ( tokens[0].type === 'ASSIGN' ) {
             tokens.shift() // Sari peste =
             condition.push(new Token('OPERATOR', 'egal'))
+        } else {
+            condition.push(tokens.shift());
         }
-        condition.push(tokens.shift());
     }
     if (tokens[0] && tokens[0].value === 'executa') {
         tokens.shift(); // Sărim peste "executa"

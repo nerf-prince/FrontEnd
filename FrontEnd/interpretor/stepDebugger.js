@@ -21,6 +21,7 @@ export class StepDebugger {
         this.executionStack = [];
         this.programCounter = 0;
         this.currentLineNumber = 0; // Track current line being executed
+        this.pendingInput = null; // Track if we're waiting for input
         
         // Build flat instruction list
         if (this.ast && this.ast.children) {
@@ -162,6 +163,8 @@ export class StepDebugger {
             currentLine: this.programCounter,
             currentLineNumber: this.currentLineNumber,
             totalLines: this.instructions.length,
+            needsInput: this.pendingInput !== null,
+            inputVariable: this.pendingInput,
             error: null
         };
     }
@@ -438,9 +441,16 @@ export class StepDebugger {
     }
 
     executeInput(node) {
-        // For debugging, we'll set a placeholder value
-        this.variables.set(node.value, 0);
-        this.outputBuffer.push(`[Input needed for: ${node.value}]\n`);
+        // Mark that we need input for this variable
+        this.pendingInput = node.value;
+        this.outputBuffer.push(`Citeste ${node.value}: `);
+    }
+    
+    provideInput(varName, value) {
+        // Set the variable value from user input
+        this.variables.set(varName, parseFloat(value) || 0);
+        this.pendingInput = null;
+        this.outputBuffer.push(`${value}\n`);
     }
 
     executeOutput(node) {
@@ -562,5 +572,6 @@ export class StepDebugger {
         this.executionStack = [];
         this.isFinished = false;
         this.error = null;
+        this.pendingInput = null;
     }
 }

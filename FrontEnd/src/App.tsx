@@ -7,6 +7,7 @@ import StartTestRoute from './StartTestRoute'
 import PracticeTestRoute from './PracticeTestRoute'
 import InterpretorPage from './InterpretorPage'
 import InterpretorWithSubject from './InterpretorWithSubject'
+import TestResultsPage from './TestResultsPage'
 
 function App() {
   const navigate = useNavigate()
@@ -53,6 +54,7 @@ function App() {
       <Route path="/test/:id" element={<TestDetailRoute />} />
       <Route path="/start/:id" element={<StartTestRoute />} />
       <Route path="/practice/:id" element={<PracticeTestRoute />} />
+      <Route path="/results/:id" element={<TestResultsPage />} />
       <Route path="/interpretor" element={<InterpretorPage onNavigateBack={navigateToLanding} />} />
       <Route path="/interpretor/:id" element={<InterpretorWithSubject />} />
 

@@ -93,7 +93,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		// Transform answers to API format (includes UserId and TestId)
 		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
 		console.log('Auto-submit - Transformed answers:', transformedAnswers)
-		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		var checkedAnswers = await firstSubjectChecker(transformedAnswers)
 		// keep checked answers locally so we can render results immediately
 		setCheckedSubmission(checkedAnswers)
 		// Submit to API
@@ -108,7 +108,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		if (result.success) {
 			console.log('Auto-submission successful!')
 			if (onSubmit) onSubmit(checkedAnswers)
-			alert('Timpul a expirat! Testul a fost trimis automat.')
+			// Show message (commented as we navigate to results)
+			// alert('Timpul a expirat! Testul a fost trimis automat.')
 		} else {
 			console.error('Auto-submission failed:', result.message)
 			alert(`Timpul a expirat! Eroare la trimiterea testului: ${result.message}`)
@@ -158,8 +159,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
 		console.log('Transformed answers:', transformedAnswers)
 
-		// Submit to API
-		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		// Check answers with AI evaluation (async)
+		var checkedAnswers = await firstSubjectChecker(transformedAnswers)
 		// keep checked answers locally to show results
 		setCheckedSubmission(checkedAnswers)
 
@@ -177,8 +178,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 			// Call the onSubmit callback if provided with checked answers
 			if (onSubmit) onSubmit(checkedAnswers)
 
-			// Show success message
-			alert('Test trimis cu succes!')
+			// Show success message (commented out as we're navigating to results page)
+			// alert('Test trimis cu succes!')
 		} else {
 			console.error('Submission failed:', result.message)
 			alert(`Eroare la trimiterea testului: ${result.message}`)

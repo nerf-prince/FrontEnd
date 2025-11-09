@@ -80,8 +80,8 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
 		console.log('Transformed answers:', transformedAnswers)
 
-		// Check answers
-		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		// Check answers (now async with AI evaluation)
+		var checkedAnswers = await firstSubjectChecker(transformedAnswers)
 		// store locally so UI can display correct/incorrect after submit
 		setCheckedSubmission(checkedAnswers)
 
@@ -95,11 +95,11 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 			const storageKey = getStorageKey()
 			localStorage.removeItem(storageKey)
 
-			// Call the onSubmit callback if provided
-			if (onSubmit) onSubmit(transformedAnswers)
+			// Call the onSubmit callback if provided with checked answers
+			if (onSubmit) onSubmit(checkedAnswers)
 
-			// Show success message
-			alert('Răspunsurile tale au fost trimise cu succes!')
+			// Show success message (commented as we navigate to results)
+			// alert('Răspunsurile tale au fost trimise cu succes!')
 		} else {
 			console.error('Practice test submission failed:', result.message)
 			alert(`Eroare la trimiterea răspunsurilor: ${result.message}`)
@@ -515,7 +515,7 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-			<Header showLoginButton={false} />
+			<Header showLoginButton={false} onNavigateToLanding={() => navigate('/')} />
 
 			{/* Explanation Dialog Container */}
 			{showExplanation && (

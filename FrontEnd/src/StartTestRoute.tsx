@@ -53,15 +53,33 @@ function StartTestRoute() {
 
   const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 
+  // Get current user for userId
+  const getCurrentUserId = () => {
+    const currentUserStr = localStorage.getItem('currentUser')
+    if (currentUserStr) {
+      try {
+        const currentUser = JSON.parse(currentUserStr)
+        return currentUser.id || ''
+      } catch {
+        return ''
+      }
+    }
+    return ''
+  }
+
   return (
     <StartTestPage
       subject={subject}
       onNavigateBack={() => navigate(`/test/${subjectId}`)}
       // @ts-ignore
       onNavigateToLanding={() => navigate('/')}
+      userId={getCurrentUserId()}
       onSubmit={(answers) => {
         console.log('Submitted answers', answers)
-        navigate(`/test/${subjectId}`)
+        // Save results to localStorage for the results page
+        localStorage.setItem(`test-results-${subjectId}`, JSON.stringify(answers))
+        // Navigate to results page
+        navigate(`/results/${subjectId}`)
       }}
     />
   )

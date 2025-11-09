@@ -47,14 +47,31 @@ function PracticeTestRoute() {
 
   const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 
+  // Get current user for userId
+  const getCurrentUserId = () => {
+    const currentUserStr = localStorage.getItem('currentUser')
+    if (currentUserStr) {
+      try {
+        const currentUser = JSON.parse(currentUserStr)
+        return currentUser.id || ''
+      } catch {
+        return ''
+      }
+    }
+    return ''
+  }
+
   return (
     <PracticeTestPage
       subject={subject}
       onNavigateBack={() => navigate(`/test/${subjectId}`)}
+      userId={getCurrentUserId()}
       onSubmit={(answers: any) => {
         console.log('Practice test answers submitted:', answers)
-        // Navigate back to test details after submission
-        navigate(`/test/${subjectId}`)
+        // Save results to localStorage for the results page
+        localStorage.setItem(`test-results-${subjectId}`, JSON.stringify(answers))
+        // Navigate to results page
+        navigate(`/results/${subjectId}`)
       }}
     />
   )

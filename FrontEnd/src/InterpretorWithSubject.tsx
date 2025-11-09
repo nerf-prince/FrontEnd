@@ -45,6 +45,9 @@ function InterpretorWithSubject() {
   const [debugMode, setDebugMode] = useState<boolean>(false)
   const [variables, setVariables] = useState<Record<string, any>>({})
   const [currentLineNumber, setCurrentLineNumber] = useState<number>(0)
+  const [needsInput, setNeedsInput] = useState<boolean>(false)
+  const [inputVariable, setInputVariable] = useState<string>('')
+  const [inputValue, setInputValue] = useState<string>('')
   const debuggerRef = useRef<any>(null)
   const editorRef = useRef<any>(null)
 
@@ -159,7 +162,46 @@ function InterpretorWithSubject() {
     setOutput(result.output || '// No output yet...')
     setCurrentLineNumber(result.currentLineNumber || 0)
     
+    // Check if we need input
+    if (result.needsInput) {
+      setNeedsInput(true)
+      setInputVariable(result.inputVariable || '')
+      setInputValue('')
+      return
+    }
+    
     // Highlight current line in editor
+    if (editorRef.current && result.currentLineNumber) {
+      highlightLine(result.currentLineNumber)
+    }
+    
+    if (result.finished) {
+      setDebugMode(false)
+      clearHighlight()
+      if (result.error) {
+        setOutput(prev => prev + `\n\n// Eroare: ${result.error}`)
+      } else {
+        setOutput(prev => prev + '\n\n// Program terminat')
+      }
+    }
+  }
+  
+  const handleProvideInput = () => {
+    if (!debuggerRef.current || !inputVariable) return
+    
+    debuggerRef.current.provideInput(inputVariable, inputValue)
+    
+    // Update state
+    setNeedsInput(false)
+    setInputVariable('')
+    setInputValue('')
+    
+    // Continue execution - call step again to show the result
+    const result = debuggerRef.current.step()
+    setVariables(result.variables)
+    setOutput(result.output || '// No output yet...')
+    setCurrentLineNumber(result.currentLineNumber || 0)
+    
     if (editorRef.current && result.currentLineNumber) {
       highlightLine(result.currentLineNumber)
     }
@@ -222,6 +264,9 @@ function InterpretorWithSubject() {
     setVariables({})
     setCurrentLineNumber(0)
     setOutput('')
+    setNeedsInput(false)
+    setInputVariable('')
+    setInputValue('')
   }
 
   const renderRequirements = () => {
@@ -402,18 +447,47 @@ function InterpretorWithSubject() {
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={handleStepIn}
-                    className="px-6 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors"
-                  >
-                    Step In {currentLineNumber > 0 && `(Line ${currentLineNumber})`}
-                  </button>
-                  <button
-                    onClick={handleResetDebug}
-                    className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
-                  >
-                    Reset
-                  </button>
+                  {needsInput ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-700">
+                        Citește {inputVariable}:
+                      </span>
+                      <input
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleProvideInput()
+                          }
+                        }}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-32"
+                        placeholder="Valoare..."
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleProvideInput}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleStepIn}
+                        className="px-6 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors"
+                      >
+                        Step In {currentLineNumber > 0 && `(Line ${currentLineNumber})`}
+                      </button>
+                      <button
+                        onClick={handleResetDebug}
+                        className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                      >
+                        Reset
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </div>
