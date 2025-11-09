@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { getSubjectId } from './utils/subjectLoader'
 
 
 interface TestDetailPageProps {
@@ -11,6 +13,8 @@ interface TestDetailPageProps {
 
 
 function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
+  const navigate = useNavigate()
+  
   const handleStartTest = () => {
     if (onStartTest) onStartTest(subject)
     else console.warn('onStartTest handler not provided')
@@ -21,7 +25,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     console.log('Practice test clicked')
   }
 
-  const renderExercise = (exerciseData: any, exerciseKey: string) => {
+  const renderExercise = (exerciseData: any, exerciseKey: string, subjectKey: string, exerciseIndex: number) => {
     // Handle Sub1 exercises with Options
     if (exerciseData.Options) {
       const options = exerciseData.Options.split('$')
@@ -41,6 +45,8 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
     // Handle Sub2 exercises with subpoints (a, b, c, d)
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
+      const isSubject2Ex1 = subjectKey === 'Sub2' && exerciseIndex === 0
+      
       return (
         <div key={exerciseKey} className="mb-6">
           {exerciseData.Sentence && (
@@ -65,6 +71,20 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
               <p className="text-sm text-gray-600">{exerciseData.d.Sentence}</p>
             )}
           </div>
+          
+          {isSubject2Ex1 && exerciseData.Code && (
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  const subjectId = getSubjectId(subject)
+                  navigate(`/interpretor/${subjectId}`)
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Deschide în Interpretor
+              </button>
+            </div>
+          )}
         </div>
       )
     }
@@ -104,7 +124,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
             return (
               <div key={`ex-${index}`} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseTitle}</h3>
-                {renderExercise(exerciseData, `ex-${index}`)}
+                {renderExercise(exerciseData, `ex-${index}`, subjectKey, index)}
               </div>
             )
           })}

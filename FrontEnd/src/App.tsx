@@ -4,6 +4,8 @@ import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
 import TestDetailRoute from './TestDetailRoute'
 import StartTestRoute from './StartTestRoute'
+import InterpretorPage from './InterpretorPage'
+import InterpretorWithSubject from './InterpretorWithSubject'
 
 function App() {
   const navigate = useNavigate()
@@ -11,13 +13,17 @@ function App() {
   const navigateToLogin = () => navigate('/login')
   const navigateToRegister = () => navigate('/register')
   const navigateToLanding = () => navigate('/')
+  const navigateToInterpretor = () => navigate('/interpretor')
 
   return (
     <Routes>
       <Route
         path="/"
         element={
-          <LandingPage onNavigateToLogin={navigateToLogin} />
+          <LandingPage 
+            onNavigateToLogin={navigateToLogin}
+            onNavigateToInterpretor={navigateToInterpretor}
+          />
         }
       />
 
@@ -45,6 +51,8 @@ function App() {
 
       <Route path="/test/:id" element={<TestDetailRoute />} />
       <Route path="/start/:id" element={<StartTestRoute />} />
+      <Route path="/interpretor" element={<InterpretorPage onNavigateBack={navigateToLanding} />} />
+      <Route path="/interpretor/:id" element={<InterpretorWithSubject />} />
 
       {/* Fallback: redirect unknown paths to landing */}
       <Route path="*" element={<Navigate to="/" replace />} />
