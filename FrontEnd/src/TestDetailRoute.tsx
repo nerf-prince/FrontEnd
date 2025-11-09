@@ -4,9 +4,9 @@ import { loadSubjectById } from './utils/subjectLoader'
 import TestDetailPage from './TestDetailPage'
 
 interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
+  id: string
+  anScolar: string
+  sesiune: string
   [key: string]: any
 }
 
@@ -57,7 +57,7 @@ function TestDetailRoute() {
       onNavigateBack={() => navigate('/')}
       onNavigateToLanding={() => navigate('/')}
       onStartTest={(subject) => {
-        const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+        const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
         navigate(`/start/${subjectId}`)
       }}
     />

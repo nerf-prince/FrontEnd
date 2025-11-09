@@ -22,12 +22,12 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
   }
 
   const renderExercise = (exerciseData: any, exerciseKey: string) => {
-    // Handle Sub1 exercises with Options
-    if (exerciseData.Options) {
-      const options = exerciseData.Options.split('$')
+    // Handle Sub1 exercises with options
+    if (exerciseData.options) {
+      const options = exerciseData.options.split('$')
       return (
         <div key={exerciseKey} className="mb-6">
-          <p className="text-base text-gray-700 mb-2">{exerciseData.Sentence}</p>
+          <p className="text-base text-gray-700 mb-2">{exerciseData.sentence}</p>
           <div className="ml-4 space-y-1">
             {options.map((option: string, idx: number) => (
               <p key={idx} className="text-sm text-gray-600">
@@ -43,53 +43,53 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
       return (
         <div key={exerciseKey} className="mb-6">
-          {exerciseData.Sentence && (
-            <p className="text-base text-gray-700 mb-3">{exerciseData.Sentence}</p>
+          {exerciseData.sentence && (
+            <p className="text-base text-gray-700 mb-3">{exerciseData.sentence}</p>
           )}
-          {exerciseData.Code && (
+          {exerciseData.code && (
             <pre className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto">
-              <code>{exerciseData.Code}</code>
+              <code>{exerciseData.code}</code>
             </pre>
           )}
           <div className="ml-4 space-y-2">
             {exerciseData.a && (
-              <p className="text-sm text-gray-600">{exerciseData.a.Sentence}</p>
+              <p className="text-sm text-gray-600">{exerciseData.a.sentence}</p>
             )}
             {exerciseData.b && (
-              <p className="text-sm text-gray-600">{exerciseData.b.Sentence}</p>
+              <p className="text-sm text-gray-600">{exerciseData.b.sentence}</p>
             )}
             {exerciseData.c && (
-              <p className="text-sm text-gray-600">{exerciseData.c.Sentence}</p>
+              <p className="text-sm text-gray-600">{exerciseData.c.sentence}</p>
             )}
             {exerciseData.d && (
-              <p className="text-sm text-gray-600">{exerciseData.d.Sentence}</p>
+              <p className="text-sm text-gray-600">{exerciseData.d.sentence}</p>
             )}
           </div>
         </div>
       )
     }
 
-    // Handle simple exercises with just Sentence
+    // Handle simple exercises with just sentence
     return (
       <div key={exerciseKey} className="mb-6">
-        <p className="text-base text-gray-700">{exerciseData.Sentence}</p>
+        <p className="text-base text-gray-700">{exerciseData.sentence}</p>
       </div>
     )
   }
 
   const renderSubject = (subjectKey: string) => {
-    const subjectData = subject[subjectKey]
+    const subjectData = (subject as any)[subjectKey]
     if (!subjectData || typeof subjectData !== 'object') return null
 
-    // Check if the subject uses the new array structure (Ex array) or old structure (Ex1, Ex2, etc.)
-    const exercises = subjectData.Ex && Array.isArray(subjectData.Ex) 
-      ? subjectData.Ex 
-      : Object.keys(subjectData).filter(key => key.startsWith('Ex')).map(key => subjectData[key])
+    // Check if the subject uses the new array structure (ex array) or old structure (ex1, ex2, etc.)
+    const exercises = subjectData.ex && Array.isArray(subjectData.ex)
+      ? subjectData.ex
+      : Object.keys(subjectData).filter(key => key.startsWith('ex')).map(key => subjectData[key])
 
     if (!exercises || exercises.length === 0) return null
 
-    // Convert Sub1, Sub2, Sub3 to "Subiectul 1", "Subiectul 2", "Subiectul 3"
-    const subjectNumber = subjectKey.replace('Sub', '')
+    // Convert sub1, sub2, sub3 to "Subiectul 1", "Subiectul 2", "Subiectul 3"
+    const subjectNumber = subjectKey.replace('sub', '')
     const subjectTitle = `Subiectul ${subjectNumber}`
 
     return (
@@ -143,7 +143,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Bacul din anul școlar {subject.AnScolar}, sesiunea de {subject.Sesiune}
+          Bacul din anul școlar {subject.anScolar}, sesiunea de {subject.sesiune}
         </h1>
 
         {/* Action buttons */}
@@ -164,7 +164,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
         {/* Subjects and exercises */}
         <div className="space-y-8">
-          {['Sub1', 'Sub2', 'Sub3'].map(subKey => renderSubject(subKey))}
+          {['sub1', 'sub2', 'sub3'].map(subKey => renderSubject(subKey))}
         </div>
       </div>
     </div>

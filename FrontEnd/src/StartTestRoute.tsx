@@ -4,9 +4,9 @@ import { loadSubjectById } from './utils/subjectLoader'
 import StartTestPage from './StartTestPage'
 
 interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
+  id: string
+  anScolar: string
+  sesiune: string
   [key: string]: any
 }
 
@@ -51,7 +51,7 @@ function StartTestRoute() {
     return <Navigate to="/" replace />
   }
 
-  const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+  const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 
   return (
     <StartTestPage

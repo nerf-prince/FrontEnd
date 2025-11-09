@@ -1,37 +1,30 @@
-interface SubjectTwoAnswer
-{
-    Ex1: {
+interface SubjectTwoAnswer {
+    ex1: {
         a: {
-            UserAnswer: string
-            Score: number
-
+            userAnswer: string
+            score: number
         }
         b: {
-            UserAnswer: string
-            Score: number
-            
+            userAnswer: string
+            score: number
         }
         c: {
-            UserAnswer: string
-            Score: number
-            
+            userAnswer: string
+            score: number
         }
         d: {
-            UserAnswer: string
-            Score: number
-            
+            userAnswer: string
+            score: number
         }
-
     }
-    Ex2: {
-        UserAnswer: string 
-        Score: number
-
+    ex2: {
+        userAnswer: string
+        score: number
     }
-    Ex3: {
-        UserAnswer: string 
-        Score: number
+    ex3: {
+        userAnswer: string
+        score: number
     }
-    
 }
+
 export type { SubjectTwoAnswer }

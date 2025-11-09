@@ -2,26 +2,27 @@
 import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
 
 interface StartTestPageProps {
 	subject: SubjectData
 	onNavigateBack: () => void
+	userId?: string // Optional user ID, defaults to empty string
 	onSubmit?: (answers: any) => void
 }
 
 // The page renders the subject and a form to collect the user's answers.
 // For Sub1 we render radio options (a/b/c/d) extracted from `Options`.
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
+function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: StartTestPageProps) {
 
-function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps) {
-	
 	const getStorageKey = () => {
-		const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+		const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 		return `test-progress-${subjectId}`
 	}
 
 	const getTimerKey = () => {
-		const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
+		const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 		return `test-timer-${subjectId}`
 	}
 
@@ -76,15 +77,30 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 		return () => clearInterval(interval)
 	}, [timeRemaining])
 
-	const handleAutoSubmit = () => {
-		const answers: any = { ...formState }
+	const handleAutoSubmit = async () => {
+		console.log('Time expired! Auto-submitting...')
+
+		// Transform answers to API format (includes UserId and TestId)
+		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+		console.log('Auto-submit - Transformed answers:', transformedAnswers)
+
+		// Submit to API
+		const result = await submitTestAnswers(transformedAnswers)
+
+		// Clear localStorage regardless of success
 		const storageKey = getStorageKey()
 		const timerKey = getTimerKey()
 		localStorage.removeItem(storageKey)
 		localStorage.removeItem(timerKey)
 
-		if (onSubmit) onSubmit(answers)
-		else console.log('Auto-submitted answers (time expired)', answers)
+		if (result.success) {
+			console.log('Auto-submission successful!')
+			if (onSubmit) onSubmit(transformedAnswers)
+			alert('Timpul a expirat! Testul a fost trimis automat.')
+		} else {
+			console.error('Auto-submission failed:', result.message)
+			alert(`Timpul a expirat! Eroare la trimiterea testului: ${result.message}`)
+		}
 	}
 
 	const formatTime = (seconds: number) => {
@@ -98,8 +114,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 	const handleSub1Change = (exerciseKey: string, value: string) => {
 		setFormState(prev => ({
 			...prev,
-			Sub1: {
-				...(prev.Sub1 || {}),
+			sub1: {
+				...(prev.sub1 || {}),
 				[exerciseKey]: value,
 			},
 		}))
@@ -121,38 +137,55 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 		})
 	}
 
-	const submit = (e: React.FormEvent) => {
+	const submit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		const answers: any = { ...formState }
 
-		// Clear localStorage after submission
-		const storageKey = getStorageKey()
-		const timerKey = getTimerKey()
-		localStorage.removeItem(storageKey)
-		localStorage.removeItem(timerKey)
+		console.log('Form state before transformation:', formState)
 
-		// Optionally map into the project's `UserAnswer` shape if desired.
-		if (onSubmit) onSubmit(answers)
-		else console.log('Submitted answers', answers)
+		// Transform answers to API format (includes UserId and TestId)
+		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+		console.log('Transformed answers:', transformedAnswers)
+
+		// Submit to API
+		const result = await submitTestAnswers(transformedAnswers)
+
+		if (result.success) {
+			console.log('Submission successful!')
+
+			// Clear localStorage after successful submission
+			const storageKey = getStorageKey()
+			const timerKey = getTimerKey()
+			localStorage.removeItem(storageKey)
+			localStorage.removeItem(timerKey)
+
+			// Call the onSubmit callback if provided
+			if (onSubmit) onSubmit(transformedAnswers)
+
+			// Show success message
+			alert('Test trimis cu succes!')
+		} else {
+			console.error('Submission failed:', result.message)
+			alert(`Eroare la trimiterea testului: ${result.message}`)
+		}
 	}
 
 	const renderSub1 = (sub: any) => {
 		if (!sub) return null
 
 		// Support two data shapes:
-		// 1) keyed exercises: { Ex1: {...}, Ex2: {...} }
-		// 2) array under 'Ex': { Ex: [ {...}, {...} ] }
-		if (Array.isArray(sub.Ex)) {
+		// 1) keyed exercises: { ex1: {...}, ex2: {...} }
+		// 2) array under 'ex': { ex: [ {...}, {...} ] }
+		if (Array.isArray(sub.ex)) {
 			return (
 				<div className="space-y-6">
-					{sub.Ex.map((item: any, idx: number) => {
-						const exKey = `Ex${idx + 1}`
+					{sub.ex.map((item: any, idx: number) => {
+						const exKey = `ex${idx + 1}`
 						const ex = item
-						const options = ex?.Options ? String(ex.Options).split('$') : []
+						const options = ex?.options ? String(ex.options).split('$') : []
 						return (
 							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
 
 								<div className="ml-4 space-y-2">
 									{options.map((opt: string, optIdx: number) => {
@@ -163,7 +196,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 													type="radio"
 													name={`sub1-${exKey}`}
 													value={letter}
-													checked={formState.Sub1?.[exKey] === letter}
+													checked={formState.sub1?.[exKey] === letter}
 													onChange={(e) => handleSub1Change(exKey, e.target.value)}
 													className="w-4 h-4"
 												/>
@@ -180,19 +213,19 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 			)
 		}
 
-		const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
+		const exercises = Object.keys(sub).filter(k => k.startsWith('ex'))
 		return (
 			<div className="space-y-6">
 				{exercises.map(exKey => {
 					const ex = sub[exKey]
 					if (!ex) return null
 
-					const options = ex.Options ? String(ex.Options).split('$') : []
+					const options = ex.options ? String(ex.options).split('$') : []
 
 					return (
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
-							{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('ex', '')}`}</h3>
+							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
 
 							<div className="ml-4 space-y-2">
 								{options.map((opt: string, idx: number) => {
@@ -203,7 +236,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 												type="radio"
 												name={`sub1-${exKey}`}
 												value={letter}
-												checked={formState.Sub1?.[exKey] === letter}
+												checked={formState.sub1?.[exKey] === letter}
 												onChange={(e) => handleSub1Change(exKey, e.target.value)}
 												className="w-4 h-4"
 											/>
@@ -223,29 +256,29 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 	const renderSub2or3 = (subKey: string, sub: any) => {
 		if (!sub) return null
 
-		// Support array under 'Ex' or keyed Ex1/Ex2
-		if (Array.isArray(sub.Ex)) {
+		// Support array under 'ex' or keyed ex1/ex2
+		if (Array.isArray(sub.ex)) {
 			return (
 				<div className="space-y-6">
-					{sub.Ex.map((item: any, idx: number) => {
-						const exKey = `Ex${idx + 1}`
+					{sub.ex.map((item: any, idx: number) => {
+						const exKey = `ex${idx + 1}`
 						const ex = item
 						if (!ex) return null
 						const hasParts = ex.a || ex.b || ex.c || ex.d
 						return (
 							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
-								{ex.Code && (
-									<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.Code}</pre>
+								{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+								{ex.code && (
+									<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.code}</pre>
 								)}
 								<div className="ml-4 space-y-3">
 									{hasParts ? (
 										['a', 'b', 'c', 'd'].map(part =>
 											ex[part] ? (
 											<div key={part}>
-												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-												{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
+												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].sentence || ''}`}</label>
+												{subKey === 'sub2' && (part === 'c' || part === 'd') ? (
 													<textarea
 														rows={3}
 														value={formState[subKey]?.[exKey]?.[part] || ''}
@@ -279,7 +312,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 			)
 		}
 
-		const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
+		const exercises = Object.keys(sub).filter(k => k.startsWith('ex'))
 		return (
 			<div className="space-y-6">
 				{exercises.map(exKey => {
@@ -291,10 +324,10 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 
 					return (
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
-							{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
-							{ex.Code && (
-								<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.Code}</pre>
+							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('ex', '')}`}</h3>
+							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
+							{ex.code && (
+								<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.code}</pre>
 							)}
 
 							<div className="ml-4 space-y-3">
@@ -302,8 +335,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 									['a', 'b', 'c', 'd'].map(part =>
 										ex[part] ? (
 										<div key={part}>
-											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-											{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
+											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].sentence || ''}`}</label>
+											{subKey === 'sub2' && (part === 'c' || part === 'd') ? (
 												<textarea
 													rows={3}
 													value={formState[subKey]?.[exKey]?.[part] || ''}
@@ -353,7 +386,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 				</button>
 
 				<h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-					Completează testul — {subject.AnScolar} · {subject.Sesiune}
+					Completează testul — {subject.anScolar} · {subject.sesiune}
 				</h1>
 
 				{/* Timer */}
@@ -370,17 +403,17 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 				<form onSubmit={submit} className="space-y-8">
 					<section>
 						<h2 className="text-2xl font-bold mb-4">Subiectul 1</h2>
-						{renderSub1(subject.Sub1)}
+						{renderSub1(subject.sub1)}
 					</section>
 
 					<section>
 						<h2 className="text-2xl font-bold mb-4">Subiectul 2</h2>
-						{renderSub2or3('Sub2', subject.Sub2)}
+						{renderSub2or3('sub2', subject.sub2)}
 					</section>
 
 					<section>
 						<h2 className="text-2xl font-bold mb-4">Subiectul 3</h2>
-						{renderSub2or3('Sub3', subject.Sub3)}
+						{renderSub2or3('sub3', subject.sub3)}
 					</section>
 
 					<div className="flex items-center gap-4">
