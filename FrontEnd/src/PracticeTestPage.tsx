@@ -98,8 +98,13 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 			// Call the onSubmit callback if provided
 			if (onSubmit) onSubmit(transformedAnswers)
 
-			// Show success message
-			alert('Răspunsurile tale au fost trimise cu succes!')
+			// Get submission ID from response and redirect to results page
+			const submissionId = result.data?.id || result.data?._id || result.data?.submissionId
+			if (submissionId) {
+				navigate(`/results/${submissionId}`)
+			} else {
+				alert('Răspunsurile tale au fost trimise cu succes!')
+			}
 		} else {
 			console.error('Practice test submission failed:', result.message)
 			alert(`Eroare la trimiterea răspunsurilor: ${result.message}`)

@@ -143,3 +143,66 @@ export function transformAnswersToApiFormat(
   return result
 }
 
+/**
+ * Fetch submission results by ID
+ * @param submissionId - The ID of the submission
+ */
+export async function getSubmissionResults(
+  submissionId: string
+): Promise<SubmissionResponse> {
+  try {
+    console.log('Fetching submission results for ID:', submissionId)
+
+    const response = await fetch(`${API_BASE_URL}/submission/${submissionId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Fetch failed:', response.status, errorText)
+      throw new Error(`Fetch failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log('Submission results:', data)
+
+    return {
+      success: true,
+      data
+    }
+  } catch (error) {
+    console.error('Error fetching submission results:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+}
+
+/**
+ * Calculate total score from submission data
+ * Recursively sums all 'Score' or 'score' properties in the submission object
+ */
+export function calculateTotalScore(submission: any): number {
+  let totalScore = 0
+
+  const traverse = (obj: any) => {
+    if (typeof obj !== 'object' || obj === null) return
+
+    for (const key in obj) {
+      // Check for both 'Score' and 'score' (case-insensitive)
+      if ((key === 'Score' || key === 'score') && typeof obj[key] === 'number') {
+        totalScore += obj[key]
+      } else if (typeof obj[key] === 'object') {
+        traverse(obj[key])
+      }
+    }
+  }
+
+  traverse(submission)
+  return totalScore
+}
+

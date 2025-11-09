@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
@@ -16,6 +17,7 @@ interface StartTestPageProps {
 // For Sub1 we render radio options (a/b/c/d) extracted from `Options`.
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
 function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: StartTestPageProps) {
+	const navigate = useNavigate()
 
 	const getStorageKey = () => {
 		const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
@@ -108,7 +110,14 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		if (result.success) {
 			console.log('Auto-submission successful!')
 			if (onSubmit) onSubmit(checkedAnswers)
-			alert('Timpul a expirat! Testul a fost trimis automat.')
+
+			// Get submission ID from response and redirect to results page
+			const submissionId = result.data?.id || result.data?._id || result.data?.submissionId
+			if (submissionId) {
+				navigate(`/results/${submissionId}`)
+			} else {
+				alert('Timpul a expirat! Testul a fost trimis automat.')
+			}
 		} else {
 			console.error('Auto-submission failed:', result.message)
 			alert(`Timpul a expirat! Eroare la trimiterea testului: ${result.message}`)
@@ -177,8 +186,13 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 			// Call the onSubmit callback if provided with checked answers
 			if (onSubmit) onSubmit(checkedAnswers)
 
-			// Show success message
-			alert('Test trimis cu succes!')
+			// Get submission ID from response and redirect to results page
+			const submissionId = result.data?.id || result.data?._id || result.data?.submissionId
+			if (submissionId) {
+				navigate(`/results/${submissionId}`)
+			} else {
+				alert('Test trimis cu succes!')
+			}
 		} else {
 			console.error('Submission failed:', result.message)
 			alert(`Eroare la trimiterea testului: ${result.message}`)
