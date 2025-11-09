@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:7024',
+        target: 'http://backend.nerfprince.soare.io/',
         changeOrigin: true,
         secure: false, // Ignore SSL certificate errors for localhost
       }

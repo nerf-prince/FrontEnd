@@ -5,6 +5,7 @@ import type { SubjectData } from './interfaces/SubjectData'
 import { generateExplanation, generatePseudocodeInterpreter, type ExerciseContext } from './utils/openaiHelper'
 import { getSubjectId } from './utils/subjectLoader'
 import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
+import { firstSubjectChecker } from './services/checkers/firstSubjectChecker'
 
 interface PracticeTestPageProps {
 	subject: SubjectData
@@ -19,6 +20,9 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 	const [explanationText, setExplanationText] = useState<string>('')
 	const [loadingExplanation, setLoadingExplanation] = useState<boolean>(false)
 	const [explanationPosition, setExplanationPosition] = useState<{ top: number; left: number } | null>(null)
+
+	// hold checked submission to show results inline after submitting
+	const [checkedSubmission, setCheckedSubmission] = useState<any | null>(null)
 
 	const getStorageKey = () => {
 		const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
@@ -73,8 +77,13 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
 		console.log('Transformed answers:', transformedAnswers)
 
+		// Check answers
+		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		// store locally so UI can display correct/incorrect after submit
+		setCheckedSubmission(checkedAnswers)
+
 		// Submit to API
-		const result = await submitTestAnswers(transformedAnswers)
+		const result = await submitTestAnswers(checkedAnswers)
 
 		if (result.success) {
 			console.log('Practice test submission successful!')
@@ -222,8 +231,20 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 								<div className="ml-4 space-y-2">
 									{options.map((opt: string, optIdx: number) => {
 										const letter = String.fromCharCode(97 + optIdx)
+										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idx] || checkedSubmission?.sub1?.ex?.[idx] || null
+										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
+										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										let optionClasses = 'text-sm px-2 py-1 rounded'
+										if (correctAns === letter) {
+											optionClasses += ' bg-green-100 text-green-800 font-semibold'
+										} else if (userAns === letter && userAns !== correctAns) {
+											optionClasses += ' bg-red-100 text-red-700'
+										} else {
+											optionClasses += ' text-gray-600'
+										}
+
 										return (
-											<label key={optIdx} className="flex items-center gap-3 text-sm text-gray-700">
+											<label key={optIdx} className={`flex items-center gap-3 ${optionClasses}`}>
 												<input
 													type="radio"
 													name={`sub1-${exKey}`}
@@ -231,9 +252,10 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 													checked={formState.sub1?.[exKey] === letter}
 													onChange={(e) => handleSub1Change(exKey, e.target.value)}
 													className="w-4 h-4"
-												/>
+													disabled={!!checkedSubmission}
+													/>
 												<span className="font-bold">{letter}.</span>
-												<span className="text-gray-600">{opt}</span>
+												<span className="flex-1">{opt}</span>
 											</label>
 										)
 									})}
@@ -275,8 +297,21 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 							<div className="ml-4 space-y-2">
 								{options.map((opt: string, idx: number) => {
 									const letter = String.fromCharCode(97 + idx)
+									const idxFromKey = parseInt(exKey.replace('ex','')) - 1
+									const submittedEx = checkedSubmission?.Sub1?.Ex?.[idxFromKey] || checkedSubmission?.sub1?.ex?.[idxFromKey] || null
+									const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
+									const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+									let optionClasses = 'text-sm px-2 py-1 rounded'
+									if (correctAns === letter) {
+										optionClasses += ' bg-green-100 text-green-800 font-semibold'
+									} else if (userAns === letter && userAns !== correctAns) {
+										optionClasses += ' bg-red-100 text-red-700'
+									} else {
+										optionClasses += ' text-gray-600'
+									}
+
 									return (
-										<label key={idx} className="flex items-center gap-3 text-sm text-gray-700">
+										<label key={idx} className={`flex items-center gap-3 ${optionClasses}`}>
 											<input
 												type="radio"
 												name={`sub1-${exKey}`}
@@ -284,12 +319,13 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 												checked={formState.sub1?.[exKey] === letter}
 												onChange={(e) => handleSub1Change(exKey, e.target.value)}
 												className="w-4 h-4"
-											/>
-											<span className="font-bold">{letter}.</span>
-											<span className="text-gray-600">{opt}</span>
-										</label>
-									)
-								})}
+												disabled={!!checkedSubmission}
+												/>
+												<span className="font-bold">{letter}.</span>
+												<span className="flex-1">{opt}</span>
+												</label>
+										)
+									})}
 							</div>
 						</div>
 					)

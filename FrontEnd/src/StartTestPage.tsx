@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
+import { firstSubjectChecker } from './services/checkers/firstSubjectChecker'
 
 interface StartTestPageProps {
 	subject: SubjectData
@@ -49,6 +50,9 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		return duration
 	})
 
+	// store checked submission after running the checker so we can show results inline
+	const [checkedSubmission, setCheckedSubmission] = useState<any | null>(null)
+
 	// Save to localStorage whenever formState changes
 	useEffect(() => {
 		const storageKey = getStorageKey()
@@ -83,9 +87,11 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		// Transform answers to API format (includes UserId and TestId)
 		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
 		console.log('Auto-submit - Transformed answers:', transformedAnswers)
-
+		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		// keep checked answers locally so we can render results immediately
+		setCheckedSubmission(checkedAnswers)
 		// Submit to API
-		const result = await submitTestAnswers(transformedAnswers)
+		const result = await submitTestAnswers(checkedAnswers)
 
 		// Clear localStorage regardless of success
 		const storageKey = getStorageKey()
@@ -95,7 +101,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 
 		if (result.success) {
 			console.log('Auto-submission successful!')
-			if (onSubmit) onSubmit(transformedAnswers)
+			if (onSubmit) onSubmit(checkedAnswers)
 			alert('Timpul a expirat! Testul a fost trimis automat.')
 		} else {
 			console.error('Auto-submission failed:', result.message)
@@ -147,7 +153,11 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		console.log('Transformed answers:', transformedAnswers)
 
 		// Submit to API
-		const result = await submitTestAnswers(transformedAnswers)
+		var checkedAnswers = firstSubjectChecker(transformedAnswers)
+		// keep checked answers locally to show results
+		setCheckedSubmission(checkedAnswers)
+
+		const result = await submitTestAnswers(checkedAnswers)
 
 		if (result.success) {
 			console.log('Submission successful!')
@@ -158,8 +168,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 			localStorage.removeItem(storageKey)
 			localStorage.removeItem(timerKey)
 
-			// Call the onSubmit callback if provided
-			if (onSubmit) onSubmit(transformedAnswers)
+			// Call the onSubmit callback if provided with checked answers
+			if (onSubmit) onSubmit(checkedAnswers)
 
 			// Show success message
 			alert('Test trimis cu succes!')
@@ -190,8 +200,22 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 								<div className="ml-4 space-y-2">
 									{options.map((opt: string, optIdx: number) => {
 										const letter = String.fromCharCode(97 + optIdx)
+										// find submitted data for this exercise if available
+										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idx] || checkedSubmission?.sub1?.ex?.[idx] || null
+										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
+										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										// score is available in submittedEx but not used directly here
+										let optionClasses = 'text-sm px-2 py-1 rounded'
+										if (correctAns === letter) {
+											optionClasses += ' bg-green-100 text-green-800 font-semibold'
+										} else if (userAns === letter && userAns !== correctAns) {
+											optionClasses += ' bg-red-100 text-red-700'
+										} else {
+											optionClasses += ' text-gray-600'
+										}
+
 										return (
-											<label key={optIdx} className="flex items-center gap-3 text-sm text-gray-700">
+											<label key={optIdx} className={`flex items-center gap-3 ${optionClasses}`}>
 												<input
 													type="radio"
 													name={`sub1-${exKey}`}
@@ -199,9 +223,10 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 													checked={formState.sub1?.[exKey] === letter}
 													onChange={(e) => handleSub1Change(exKey, e.target.value)}
 													className="w-4 h-4"
-												/>
+													disabled={!!checkedSubmission}
+													/>
 												<span className="font-bold">{letter}.</span>
-												<span className="text-gray-600">{opt}</span>
+												<span className="flex-1">{opt}</span>
 											</label>
 										)
 									})}
@@ -228,23 +253,37 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 							{ex.sentence && <p className="text-sm text-gray-700 mb-3">{ex.sentence}</p>}
 
 							<div className="ml-4 space-y-2">
-								{options.map((opt: string, idx: number) => {
-									const letter = String.fromCharCode(97 + idx) // a, b, c, d
-									return (
-										<label key={idx} className="flex items-center gap-3 text-sm text-gray-700">
-											<input
-												type="radio"
-												name={`sub1-${exKey}`}
-												value={letter}
-												checked={formState.sub1?.[exKey] === letter}
-												onChange={(e) => handleSub1Change(exKey, e.target.value)}
-												className="w-4 h-4"
-											/>
-											<span className="font-bold">{letter}.</span>
-											<span className="text-gray-600">{opt}</span>
-											</label>
-									)
-								})}
+									{options.map((opt: string, idx: number) => {
+										const letter = String.fromCharCode(97 + idx) // a, b, c, d
+										const idxFromKey = parseInt(exKey.replace('ex','')) - 1
+										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idxFromKey] || checkedSubmission?.sub1?.ex?.[idxFromKey] || null
+										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
+										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										let optionClasses = 'text-sm px-2 py-1 rounded'
+										if (correctAns === letter) {
+											optionClasses += ' bg-green-100 text-green-800 font-semibold'
+										} else if (userAns === letter && userAns !== correctAns) {
+											optionClasses += ' bg-red-100 text-red-700'
+										} else {
+											optionClasses += ' text-gray-600'
+										}
+
+										return (
+											<label key={idx} className={`flex items-center gap-3 ${optionClasses}`}>
+												<input
+													type="radio"
+													name={`sub1-${exKey}`}
+													value={letter}
+													checked={formState.sub1?.[exKey] === letter}
+													onChange={(e) => handleSub1Change(exKey, e.target.value)}
+													className="w-4 h-4"
+													disabled={!!checkedSubmission}
+													/>
+												<span className="font-bold">{letter}.</span>
+												<span className="flex-1">{opt}</span>
+												</label>
+										)
+									})}
 							</div>
 						</div>
 					)
