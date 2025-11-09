@@ -70,9 +70,9 @@ function SubjectsList() {
     setFilteredSubjects(filtered)
   }, [selectedYear, selectedSession, subjects])
 
-  // Extrage ani unici din subjects
+  // Extrage ani unici și sesiuni unice din subjects
   const uniqueYears = ['Toate', ...Array.from(new Set(subjects.map(s => s.anScolar)))]
-  const sessions = ['Toate', 'Toamna', 'Vara', 'Sesiune Speciala', 'Model']
+  const uniqueSessions = ['Toate', ...Array.from(new Set(subjects.map(s => s.sesiune)))]
 
   if (loading) {
     return (
@@ -131,7 +131,7 @@ function SubjectsList() {
             onChange={(e) => setSelectedSession(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 cursor-pointer"
           >
-            {sessions.map((session) => (
+            {uniqueSessions.map((session) => (
               <option key={session} value={session}>
                 {session}
               </option>

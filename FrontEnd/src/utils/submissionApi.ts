@@ -1,6 +1,6 @@
 // API functions for submitting test answers
 
-const API_BASE_URL = 'http://backend.nerfprince.soare.io/api'
+const API_BASE_URL = 'https://backend.nerfprince.soare.io/api'
 
 interface SubmissionResponse {
   success: boolean

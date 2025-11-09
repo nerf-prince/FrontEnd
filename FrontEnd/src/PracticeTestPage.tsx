@@ -20,6 +20,9 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 	const [explanationText, setExplanationText] = useState<string>('')
 	const [loadingExplanation, setLoadingExplanation] = useState<boolean>(false)
 	const [explanationPosition, setExplanationPosition] = useState<{ top: number; left: number } | null>(null)
+	
+	// Track which exercises have had their explanations viewed
+	const [viewedExplanations, setViewedExplanations] = useState<Set<string>>(new Set())
 
 	// hold checked submission to show results inline after submitting
 	const [checkedSubmission, setCheckedSubmission] = useState<any | null>(null)
@@ -110,6 +113,9 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 			closeExplanationPopup()
 			return
 		}
+
+		// Mark this exercise as having viewed explanation
+		setViewedExplanations(prev => new Set(prev).add(key))
 
 		setShowExplanation(key)
 		setLoadingExplanation(true)
@@ -234,10 +240,11 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idx] || checkedSubmission?.sub1?.ex?.[idx] || null
 										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
 										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										const hasViewedExplanation = viewedExplanations.has(`sub1-${exKey}`)
 										let optionClasses = 'text-sm px-2 py-1 rounded'
-										if (correctAns === letter) {
+										if (hasViewedExplanation && correctAns === letter) {
 											optionClasses += ' bg-green-100 text-green-800 font-semibold'
-										} else if (userAns === letter && userAns !== correctAns) {
+										} else if (checkedSubmission && userAns === letter && userAns !== correctAns) {
 											optionClasses += ' bg-red-100 text-red-700'
 										} else {
 											optionClasses += ' text-gray-600'
@@ -301,10 +308,11 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 									const submittedEx = checkedSubmission?.Sub1?.Ex?.[idxFromKey] || checkedSubmission?.sub1?.ex?.[idxFromKey] || null
 									const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
 									const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+									const hasViewedExplanation = viewedExplanations.has(`sub1-${exKey}`)
 									let optionClasses = 'text-sm px-2 py-1 rounded'
-									if (correctAns === letter) {
+									if (hasViewedExplanation && correctAns === letter) {
 										optionClasses += ' bg-green-100 text-green-800 font-semibold'
-									} else if (userAns === letter && userAns !== correctAns) {
+									} else if (checkedSubmission && userAns === letter && userAns !== correctAns) {
 										optionClasses += ' bg-red-100 text-red-700'
 									} else {
 										optionClasses += ' text-gray-600'
@@ -614,10 +622,6 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 					<div className="flex items-center gap-4">
 						<button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors">
 							Trimite răspunsurile
-						</button>
-
-						<button type="button" onClick={() => console.log('Preview answers', formState)} className="text-sm text-gray-600 hover:text-gray-800">
-							Preview answers
 						</button>
 					</div>
 				</form>

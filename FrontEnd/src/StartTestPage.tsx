@@ -81,6 +81,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		return () => clearInterval(interval)
 	}, [timeRemaining])
 
+	const handleCancelTest = () => {
+		// Clear entire localStorage as requested and navigate back to preview/details
+		localStorage.clear()
+		if (onNavigateBack) onNavigateBack()
+	}
+
 	const handleAutoSubmit = async () => {
 		console.log('Time expired! Auto-submitting...')
 
@@ -203,12 +209,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 										// find submitted data for this exercise if available
 										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idx] || checkedSubmission?.sub1?.ex?.[idx] || null
 										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
-										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : undefined
 										// score is available in submittedEx but not used directly here
 										let optionClasses = 'text-sm px-2 py-1 rounded'
-										if (correctAns === letter) {
+										if (checkedSubmission && correctAns === letter) {
 											optionClasses += ' bg-green-100 text-green-800 font-semibold'
-										} else if (userAns === letter && userAns !== correctAns) {
+										} else if (checkedSubmission && userAns === letter && userAns !== correctAns) {
 											optionClasses += ' bg-red-100 text-red-700'
 										} else {
 											optionClasses += ' text-gray-600'
@@ -258,11 +264,11 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 										const idxFromKey = parseInt(exKey.replace('ex','')) - 1
 										const submittedEx = checkedSubmission?.Sub1?.Ex?.[idxFromKey] || checkedSubmission?.sub1?.ex?.[idxFromKey] || null
 										const userAns = submittedEx ? (submittedEx.UserAnswer ?? submittedEx.userAnswer) : undefined
-										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : (ex.Answer ?? ex.answer)
+										const correctAns = submittedEx ? (submittedEx.Answer ?? submittedEx.answer) : undefined
 										let optionClasses = 'text-sm px-2 py-1 rounded'
-										if (correctAns === letter) {
+										if (checkedSubmission && correctAns === letter) {
 											optionClasses += ' bg-green-100 text-green-800 font-semibold'
-										} else if (userAns === letter && userAns !== correctAns) {
+										} else if (checkedSubmission && userAns === letter && userAns !== correctAns) {
 											optionClasses += ' bg-red-100 text-red-700'
 										} else {
 											optionClasses += ' text-gray-600'
@@ -428,18 +434,23 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 					Completează testul — {subject.anScolar} · {subject.sesiune}
 				</h1>
 
-				{/* Timer */}
-				<div className="mb-8 flex justify-center">
-					<div className={`px-6 py-3 rounded-xl font-bold text-2xl ${
-						timeRemaining < 600 ? 'bg-red-100 text-red-700' : 
-						timeRemaining < 1800 ? 'bg-yellow-100 text-yellow-700' : 
-						'bg-blue-100 text-blue-700'
-					}`}>
-						⏱️ Timp rămas: {formatTime(timeRemaining)}
-					</div>
-				</div>
-
-				<form onSubmit={submit} className="space-y-8">
+		{/* Timer + Cancel button */}
+		<div className="mb-8 flex justify-center items-center gap-4">
+			<div className={`px-6 py-3 rounded-xl font-bold text-2xl ${
+				timeRemaining < 600 ? 'bg-red-100 text-red-700' : 
+				timeRemaining < 1800 ? 'bg-yellow-100 text-yellow-700' : 
+				'bg-blue-100 text-blue-700'
+			}`}>
+				⏱️ Timp rămas: {formatTime(timeRemaining)}
+			</div>
+			<button
+				type="button"
+				onClick={handleCancelTest}
+				className="bg-red-100 text-red-700 px-6 py-3 rounded-xl font-bold text-2xl hover:bg-red-200 transition-colors"
+			>
+				Anulează testul
+			</button>
+		</div>				<form onSubmit={submit} className="space-y-8">
 					<section>
 						<h2 className="text-2xl font-bold mb-4">Subiectul 1</h2>
 						{renderSub1(subject.sub1)}
@@ -458,10 +469,6 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 					<div className="flex items-center gap-4">
 						<button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold">
 							Trimite răspunsurile
-						</button>
-
-						<button type="button" onClick={() => console.log('Preview answers', formState)} className="text-sm text-gray-600">
-							Preview answers
 						</button>
 					</div>
 				</form>
