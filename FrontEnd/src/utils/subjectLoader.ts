@@ -29,3 +29,13 @@ export async function loadSubjectById(id: string): Promise<SubjectData | null> {
 export function getSubjectId(subject: SubjectData): string {
   return subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
 }
+
+/**
+ * Converts \n characters in text to actual line breaks for rendering
+ * Returns an array of text segments that can be rendered with <br/> between them
+ */
+export function parseNewlines(text: string | undefined | null): string[] {
+  if (!text) return []
+  return text.split('\n')
+}
+

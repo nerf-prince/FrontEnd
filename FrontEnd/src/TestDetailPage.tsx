@@ -1,5 +1,6 @@
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { TextWithNewlines, CodeWithNewlines } from './utils/TextWithNewlines'
 
 
 interface TestDetailPageProps {
@@ -7,18 +8,19 @@ interface TestDetailPageProps {
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
   onStartTest?: (subject: SubjectData) => void
+  onPracticeTest?: (subject: SubjectData) => void
 }
 
 
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
+function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest, onPracticeTest }: TestDetailPageProps) {
   const handleStartTest = () => {
     if (onStartTest) onStartTest(subject)
     else console.warn('onStartTest handler not provided')
   }
 
   const handlePracticeTest = () => {
-    // TODO: Implement practice test functionality
-    console.log('Practice test clicked')
+    if (onPracticeTest) onPracticeTest(subject)
+    else console.warn('onPracticeTest handler not provided')
   }
 
   const renderExercise = (exerciseData: any, exerciseKey: string) => {
@@ -27,7 +29,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
       const options = exerciseData.Options.split('$')
       return (
         <div key={exerciseKey} className="mb-6">
-          <p className="text-base text-gray-700 mb-2">{exerciseData.Sentence}</p>
+          <TextWithNewlines text={exerciseData.Sentence} className="text-base text-gray-700 mb-2" />
           <div className="ml-4 space-y-1">
             {options.map((option: string, idx: number) => (
               <p key={idx} className="text-sm text-gray-600">
@@ -41,28 +43,24 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
     // Handle Sub2 exercises with subpoints (a, b, c, d)
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
-      return (
-        <div key={exerciseKey} className="mb-6">
-          {exerciseData.Sentence && (
-            <p className="text-base text-gray-700 mb-3">{exerciseData.Sentence}</p>
-          )}
-          {exerciseData.Code && (
-            <pre className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto">
-              <code>{exerciseData.Code}</code>
-            </pre>
-          )}
-          <div className="ml-4 space-y-2">
+    return (
+      <div key={exerciseKey} className="mb-6">
+        {exerciseData.Sentence && (
+          <TextWithNewlines text={exerciseData.Sentence} className="text-base text-gray-700 mb-3" />
+        )}
+        <CodeWithNewlines code={exerciseData.Code} className="bg-gray-100 p-4 rounded-lg mb-3 text-sm overflow-x-auto" />
+        <div className="ml-4 space-y-2">
             {exerciseData.a && (
-              <p className="text-sm text-gray-600">{exerciseData.a.Sentence}</p>
+              <TextWithNewlines text={exerciseData.a.Sentence} className="text-sm text-gray-600" />
             )}
             {exerciseData.b && (
-              <p className="text-sm text-gray-600">{exerciseData.b.Sentence}</p>
+              <TextWithNewlines text={exerciseData.b.Sentence} className="text-sm text-gray-600" />
             )}
             {exerciseData.c && (
-              <p className="text-sm text-gray-600">{exerciseData.c.Sentence}</p>
+              <TextWithNewlines text={exerciseData.c.Sentence} className="text-sm text-gray-600" />
             )}
             {exerciseData.d && (
-              <p className="text-sm text-gray-600">{exerciseData.d.Sentence}</p>
+              <TextWithNewlines text={exerciseData.d.Sentence} className="text-sm text-gray-600" />
             )}
           </div>
         </div>
@@ -72,7 +70,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     // Handle simple exercises with just Sentence
     return (
       <div key={exerciseKey} className="mb-6">
-        <p className="text-base text-gray-700">{exerciseData.Sentence}</p>
+        <TextWithNewlines text={exerciseData.Sentence} className="text-base text-gray-700" />
       </div>
     )
   }

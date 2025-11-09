@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { TextWithNewlines, CodeWithNewlines } from './utils/TextWithNewlines'
 
 interface StartTestPageProps {
 	subject: SubjectData
@@ -147,12 +148,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 				<div className="space-y-6">
 					{sub.Ex.map((item: any, idx: number) => {
 						const exKey = `Ex${idx + 1}`
-						const ex = item
-						const options = ex?.Options ? String(ex.Options).split('$') : []
-						return (
-							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+					const ex = item
+					const options = ex?.Options ? String(ex.Options).split('$') : []
+					return (
+						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
+							{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
 
 								<div className="ml-4 space-y-2">
 									{options.map((opt: string, optIdx: number) => {
@@ -180,19 +181,19 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 			)
 		}
 
-		const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
-		return (
-			<div className="space-y-6">
-				{exercises.map(exKey => {
-					const ex = sub[exKey]
-					if (!ex) return null
+	const exercises = Object.keys(sub).filter(k => k.startsWith('Ex'))
+	return (
+		<div className="space-y-6">
+			{exercises.map(exKey => {
+				const ex = sub[exKey]
+				if (!ex) return null
 
-					const options = ex.Options ? String(ex.Options).split('$') : []
+				const options = ex.Options ? String(ex.Options).split('$') : []
 
-					return (
-						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
-							{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
+				return (
+					<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+						<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
+						{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
 
 							<div className="ml-4 space-y-2">
 								{options.map((opt: string, idx: number) => {
@@ -233,18 +234,16 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 						if (!ex) return null
 						const hasParts = ex.a || ex.b || ex.c || ex.d
 						return (
-							<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-								<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
-								{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
-								{ex.Code && (
-									<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.Code}</pre>
-								)}
-								<div className="ml-4 space-y-3">
-									{hasParts ? (
-										['a', 'b', 'c', 'd'].map(part =>
-											ex[part] ? (
-											<div key={part}>
-												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+					<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+					<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${idx + 1}`}</h3>
+					{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
+					<CodeWithNewlines code={ex.Code} />
+					<div className="ml-4 space-y-3">
+							{hasParts ? (
+								['a', 'b', 'c', 'd'].map(part =>
+									ex[part] ? (
+									<div key={part}>
+										<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
 												{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
 													<textarea
 														rows={3}
@@ -289,20 +288,17 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 					// If exercise has subparts a/b/c/d, show one input per subpart
 					const hasParts = ex.a || ex.b || ex.c || ex.d
 
-					return (
-						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-							<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
-							{ex.Sentence && <p className="text-sm text-gray-700 mb-3">{ex.Sentence}</p>}
-							{ex.Code && (
-								<pre className="bg-gray-100 p-3 rounded mb-3 text-sm overflow-x-auto">{ex.Code}</pre>
-							)}
+		return (
+			<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+				<h3 className="text-lg font-semibold mb-2">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
+				{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
+				<CodeWithNewlines code={ex.Code} />
 
-							<div className="ml-4 space-y-3">
-								{hasParts ? (
-									['a', 'b', 'c', 'd'].map(part =>
-										ex[part] ? (
-										<div key={part}>
-											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+				<div className="ml-4 space-y-3">
+						{hasParts ? (
+							['a', 'b', 'c', 'd'].map(part =>
+								ex[part] ? (
+								<div key={part}>
 											{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
 												<textarea
 													rows={3}

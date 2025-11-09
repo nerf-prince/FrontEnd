@@ -4,6 +4,7 @@ import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
 import TestDetailRoute from './TestDetailRoute'
 import StartTestRoute from './StartTestRoute'
+import PracticeTestRoute from './PracticeTestRoute'
 
 function App() {
   const navigate = useNavigate()
@@ -45,6 +46,7 @@ function App() {
 
       <Route path="/test/:id" element={<TestDetailRoute />} />
       <Route path="/start/:id" element={<StartTestRoute />} />
+      <Route path="/practice/:id" element={<PracticeTestRoute />} />
 
       {/* Fallback: redirect unknown paths to landing */}
       <Route path="*" element={<Navigate to="/" replace />} />
