@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate, Navigate } from 'react-router-dom'
+import { useParams, useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { loadSubjectById } from './utils/subjectLoader'
 import TestDetailPage from './TestDetailPage'
 
@@ -51,9 +51,13 @@ function TestDetailRoute() {
     return <Navigate to="/" replace />
   }
 
+  const location = useLocation()
+  const submission = (location.state as any)?.submission
+
   return (
     <TestDetailPage
       subject={subject}
+      submission={submission}
       onNavigateBack={() => navigate('/')}
       onNavigateToLanding={() => navigate('/')}
       onStartTest={(subject) => {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
+import { firstSubjectChecker } from './services/checkers/firstSubjectChecker'
 
 interface StartTestPageProps {
 	subject: SubjectData
@@ -81,11 +82,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		console.log('Time expired! Auto-submitting...')
 
 		// Transform answers to API format (includes UserId and TestId)
-		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+	const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+	const checkedAnswers = firstSubjectChecker(transformedAnswers)
 		console.log('Auto-submit - Transformed answers:', transformedAnswers)
 
 		// Submit to API
-		const result = await submitTestAnswers(transformedAnswers)
+		const result = await submitTestAnswers(checkedAnswers)
 
 		// Clear localStorage regardless of success
 		const storageKey = getStorageKey()
@@ -93,9 +95,10 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		localStorage.removeItem(storageKey)
 		localStorage.removeItem(timerKey)
 
-		if (result.success) {
+	if (result.success) {
 			console.log('Auto-submission successful!')
-			if (onSubmit) onSubmit(transformedAnswers)
+			// pass the checked answers so the caller can render scores/highlights
+			if (onSubmit) onSubmit(checkedAnswers)
 			alert('Timpul a expirat! Testul a fost trimis automat.')
 		} else {
 			console.error('Auto-submission failed:', result.message)
@@ -143,11 +146,12 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 		console.log('Form state before transformation:', formState)
 
 		// Transform answers to API format (includes UserId and TestId)
-		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
-		console.log('Transformed answers:', transformedAnswers)
+	const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+	const checkedAnswers = firstSubjectChecker(transformedAnswers)
+		console.log('Transformed answers:', checkedAnswers)
 
 		// Submit to API
-		const result = await submitTestAnswers(transformedAnswers)
+		const result = await submitTestAnswers(checkedAnswers)
 
 		if (result.success) {
 			console.log('Submission successful!')
@@ -158,8 +162,8 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Start
 			localStorage.removeItem(storageKey)
 			localStorage.removeItem(timerKey)
 
-			// Call the onSubmit callback if provided
-			if (onSubmit) onSubmit(transformedAnswers)
+			// Call the onSubmit callback if provided with the checked answers
+			if (onSubmit) onSubmit(checkedAnswers)
 
 			// Show success message
 			alert('Test trimis cu succes!')

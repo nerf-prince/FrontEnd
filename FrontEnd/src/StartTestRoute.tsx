@@ -59,7 +59,8 @@ function StartTestRoute() {
       onNavigateBack={() => navigate(`/test/${subjectId}`)}
       onSubmit={(answers) => {
         console.log('Submitted answers', answers)
-        navigate(`/test/${subjectId}`)
+        // navigate back to test detail and pass submission via navigation state
+        navigate(`/test/${subjectId}`, { state: { submission: answers } })
       }}
     />
   )

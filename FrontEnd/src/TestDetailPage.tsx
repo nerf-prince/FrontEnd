@@ -4,13 +4,14 @@ import type { SubjectData } from './interfaces/SubjectData'
 
 interface TestDetailPageProps {
   subject: SubjectData
+  submission?: any
   onNavigateBack: () => void
   onNavigateToLanding?: () => void
   onStartTest?: (subject: SubjectData) => void
 }
 
 
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
+function TestDetailPage({ subject, submission, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
   const handleStartTest = () => {
     if (onStartTest) onStartTest(subject)
     else console.warn('onStartTest handler not provided')
@@ -21,19 +22,63 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     console.log('Practice test clicked')
   }
 
-  const renderExercise = (exerciseData: any, exerciseKey: string) => {
+  const renderExercise = (exerciseData: any, exerciseKey: string, exerciseIndex: number, submissionForSubject?: any) => {
+    // small helpers to support different JSON casings (Score vs score, UserAnswer vs userAnswer)
+    const getScoreFrom = (obj: any) => {
+      if (!obj) return undefined
+      return obj.Score ?? obj.score ?? undefined
+    }
+
+    const getUserAnswerFrom = (obj: any) => {
+      if (!obj) return undefined
+      return obj.UserAnswer ?? obj.userAnswer ?? undefined
+    }
+
+    const getCorrectAnswerFrom = (obj: any) => {
+      if (!obj) return undefined
+      return obj.Answer ?? obj.answer ?? undefined
+    }
+    const getFeedbackFrom = (obj: any) => {
+      if (!obj) return undefined
+      return obj.Feedback ?? obj.feedback ?? obj.Comment ?? obj.comment ?? undefined
+    }
     // Handle Sub1 exercises with options
     if (exerciseData.options) {
       const options = exerciseData.options.split('$')
+      // submissionForSubject should be the array of submitted Ex objects for Sub1
+      const submittedEx = submissionForSubject ? submissionForSubject[exerciseIndex] : null
+
       return (
         <div key={exerciseKey} className="mb-6">
           <p className="text-base text-gray-700 mb-2">{exerciseData.sentence}</p>
-          <div className="ml-4 space-y-1">
-            {options.map((option: string, idx: number) => (
-              <p key={idx} className="text-sm text-gray-600">
-                <b>{String.fromCharCode(97 + idx)}.</b> {option}
-              </p>
-            ))}
+          <div className="ml-4 space-y-2">
+            {options.map((option: string, idx: number) => {
+              const letter = String.fromCharCode(97 + idx)
+              const userAns = getUserAnswerFrom(submittedEx)
+              const correctAns = getCorrectAnswerFrom(submittedEx)
+              const score = getScoreFrom(submittedEx)
+              const isUserSelected = userAns === letter
+              const isCorrect = correctAns === letter
+
+              // priority: correct answer should be green; if user selected wrong answer show red
+              let classes = 'text-sm px-2 py-1 rounded'
+              if (isCorrect) {
+                classes += ' bg-green-100 text-green-800 font-semibold'
+              } else if (isUserSelected && score === 0) {
+                classes += ' bg-red-100 text-red-700'
+              } else if (isUserSelected && score === 5) {
+                classes += ' bg-green-100 text-green-800 font-semibold'
+              } else {
+                classes += ' text-gray-600'
+              }
+
+              return (
+                <div key={idx} className={`flex items-start gap-3 ${classes}`}>
+                  <span className="font-bold">{letter}.</span>
+                  <span className="flex-1">{option}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )
@@ -41,6 +86,10 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
     // Handle Sub2 exercises with subpoints (a, b, c, d)
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
+      // For submission data, submissionForSubject is expected to be an object like { Ex1: {...}, Ex2: {...} }
+      const ExKey = `Ex${exerciseIndex + 1}`
+      const submittedThis = submissionForSubject ? submissionForSubject[ExKey] : undefined
+
       return (
         <div key={exerciseKey} className="mb-6">
           {exerciseData.sentence && (
@@ -52,27 +101,53 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
             </pre>
           )}
           <div className="ml-4 space-y-2">
-            {exerciseData.a && (
-              <p className="text-sm text-gray-600">{exerciseData.a.sentence}</p>
-            )}
-            {exerciseData.b && (
-              <p className="text-sm text-gray-600">{exerciseData.b.sentence}</p>
-            )}
-            {exerciseData.c && (
-              <p className="text-sm text-gray-600">{exerciseData.c.sentence}</p>
-            )}
-            {exerciseData.d && (
-              <p className="text-sm text-gray-600">{exerciseData.d.sentence}</p>
-            )}
+            {['a', 'b', 'c', 'd'].map(part => (
+              exerciseData[part] ? (
+                <div key={part} className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">{exerciseData[part].sentence}</p>
+                  {/* show part score if available (do NOT show answer key) */}
+                  {(() => {
+                    const partScore = submittedThis && submittedThis[part] ? getScoreFrom(submittedThis[part]) : undefined
+                    const partFeedback = submittedThis && submittedThis[part] ? getFeedbackFrom(submittedThis[part]) : undefined
+                    const badgeClasses = typeof partScore === 'number' ? (partScore === 5 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700') : 'bg-gray-100 text-gray-700'
+                    return (
+                      <div className="ml-4 flex flex-col items-end gap-2">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-sm font-medium ${badgeClasses}`}>
+                          {typeof partScore === 'number' ? `Scor: ${partScore}` : 'Scor: -'}
+                        </span>
+                        <div className="w-56 max-w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+                          {partFeedback ?? 'Fără feedback'}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              ) : null
+            ))}
           </div>
         </div>
       )
     }
 
     // Handle simple exercises with just sentence
+    // For simple exercises (no subparts) we can show the score (if available) next to the sentence
+    const ExKey = `Ex${exerciseIndex + 1}`
+    const submittedThis = submissionForSubject ? submissionForSubject[ExKey] : undefined
+  const scoreDisplay = getScoreFrom(submittedThis)
+
     return (
       <div key={exerciseKey} className="mb-6">
-        <p className="text-base text-gray-700">{exerciseData.sentence}</p>
+        <div className="flex items-start justify-between">
+          <p className="text-base text-gray-700">{exerciseData.sentence}</p>
+          <div className="ml-4 flex flex-col items-end gap-2">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-sm font-medium ${typeof scoreDisplay === 'number' ? (scoreDisplay === 5 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700') : 'bg-gray-100 text-gray-700'}`}>
+              {typeof scoreDisplay === 'number' ? `Scor: ${scoreDisplay}` : 'Scor: -'}
+            </span>
+            <div className="w-56 max-w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+              {getFeedbackFrom(submittedThis) ?? 'Fără feedback'}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -101,10 +176,25 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
             const exerciseNumber = index + 1
             const exerciseTitle = `Exercițiul ${exerciseNumber}`
 
+            // pick submission data for this subject (handle API PascalCase and local camelCase)
+            let submissionForSubject = undefined
+            if ((submission as any)) {
+              const s = submission as any
+              if (subjectKey === 'sub1') {
+                // Sub1 uses an array under Sub1.Ex in the API sample
+                submissionForSubject = s.Sub1?.Ex || s.sub1?.ex || s.Sub1 || s.sub1
+              } else if (subjectKey === 'sub2') {
+                // Sub2 uses Ex1/Ex2/Ex3 keys (PascalCase from API) or sub2.ex1 (camelCase)
+                submissionForSubject = s.Sub2 || s.sub2
+              } else if (subjectKey === 'sub3') {
+                submissionForSubject = s.Sub3 || s.sub3
+              }
+            }
+
             return (
               <div key={`ex-${index}`} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseTitle}</h3>
-                {renderExercise(exerciseData, `ex-${index}`)}
+                {renderExercise(exerciseData, `ex-${index}`, index, submissionForSubject)}
               </div>
             )
           })}
