@@ -5,8 +5,8 @@ interface SubjectData {
   [key: string]: any
 }
 
-// Use relative path for Vite proxy in dev, or adjust for production
-const API_BASE_URL = '/api'
+// Direct URL to backend API
+const API_BASE_URL = 'https://localhost:7024/api'
 const FALLBACK_JSON = '/Mock/ListaSubiecte.json'
 
 let cachedSubjects: SubjectData[] | null = null

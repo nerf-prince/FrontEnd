@@ -2,19 +2,20 @@
 import { useState, useEffect } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { submitTestAnswers, transformAnswersToApiFormat } from './utils/submissionApi'
 
 interface StartTestPageProps {
 	subject: SubjectData
 	onNavigateBack: () => void
+	userId?: string // Optional user ID, defaults to empty string
 	onSubmit?: (answers: any) => void
 }
 
 // The page renders the subject and a form to collect the user's answers.
 // For Sub1 we render radio options (a/b/c/d) extracted from `Options`.
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
+function StartTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: StartTestPageProps) {
 
-function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps) {
-	
 	const getStorageKey = () => {
 		const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 		return `test-progress-${subjectId}`
@@ -76,15 +77,30 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 		return () => clearInterval(interval)
 	}, [timeRemaining])
 
-	const handleAutoSubmit = () => {
-		const answers: any = { ...formState }
+	const handleAutoSubmit = async () => {
+		console.log('Time expired! Auto-submitting...')
+
+		// Transform answers to API format (includes UserId and TestId)
+		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+		console.log('Auto-submit - Transformed answers:', transformedAnswers)
+
+		// Submit to API
+		const result = await submitTestAnswers(transformedAnswers)
+
+		// Clear localStorage regardless of success
 		const storageKey = getStorageKey()
 		const timerKey = getTimerKey()
 		localStorage.removeItem(storageKey)
 		localStorage.removeItem(timerKey)
 
-		if (onSubmit) onSubmit(answers)
-		else console.log('Auto-submitted answers (time expired)', answers)
+		if (result.success) {
+			console.log('Auto-submission successful!')
+			if (onSubmit) onSubmit(transformedAnswers)
+			alert('Timpul a expirat! Testul a fost trimis automat.')
+		} else {
+			console.error('Auto-submission failed:', result.message)
+			alert(`Timpul a expirat! Eroare la trimiterea testului: ${result.message}`)
+		}
 	}
 
 	const formatTime = (seconds: number) => {
@@ -121,19 +137,36 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 		})
 	}
 
-	const submit = (e: React.FormEvent) => {
+	const submit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		const answers: any = { ...formState }
 
-		// Clear localStorage after submission
-		const storageKey = getStorageKey()
-		const timerKey = getTimerKey()
-		localStorage.removeItem(storageKey)
-		localStorage.removeItem(timerKey)
+		console.log('Form state before transformation:', formState)
 
-		// Optionally map into the project's `UserAnswer` shape if desired.
-		if (onSubmit) onSubmit(answers)
-		else console.log('Submitted answers', answers)
+		// Transform answers to API format (includes UserId and TestId)
+		const transformedAnswers = transformAnswersToApiFormat(subject, formState, userId)
+		console.log('Transformed answers:', transformedAnswers)
+
+		// Submit to API
+		const result = await submitTestAnswers(transformedAnswers)
+
+		if (result.success) {
+			console.log('Submission successful!')
+
+			// Clear localStorage after successful submission
+			const storageKey = getStorageKey()
+			const timerKey = getTimerKey()
+			localStorage.removeItem(storageKey)
+			localStorage.removeItem(timerKey)
+
+			// Call the onSubmit callback if provided
+			if (onSubmit) onSubmit(transformedAnswers)
+
+			// Show success message
+			alert('Test trimis cu succes!')
+		} else {
+			console.error('Submission failed:', result.message)
+			alert(`Eroare la trimiterea testului: ${result.message}`)
+		}
 	}
 
 	const renderSub1 = (sub: any) => {
