@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Header from './Header'
 import CodeEditor from './components/CodeEditor'
@@ -12,6 +12,20 @@ import { lexer } from '../interpretor/lexer.js'
 import { parser } from '../interpretor/parser.js'
 // @ts-ignore
 import { generateCPP } from '../transpiler/cppTranspiler.js'
+// @ts-ignore
+import { StepDebugger } from '../interpretor/stepDebugger.js'
+
+// Add CSS for debugger highlighting
+const debuggerStyles = `
+  .debugger-line-highlight {
+    background-color: rgba(255, 235, 59, 0.3) !important;
+  }
+  .debugger-line-glyph {
+    background-color: #ffeb3b;
+    width: 5px !important;
+    margin-left: 3px;
+  }
+`;
 
 function InterpretorWithSubject() {
   const { id } = useParams<{ id: string }>()
@@ -26,6 +40,13 @@ function InterpretorWithSubject() {
   const [isRunning, setIsRunning] = useState<boolean>(false)
   const [output, setOutput] = useState<string>('')
   const [cppCode, setCppCode] = useState<string>('// Codul C++ va apărea aici după transpilare...')
+  
+  // Debugger state
+  const [debugMode, setDebugMode] = useState<boolean>(false)
+  const [variables, setVariables] = useState<Record<string, any>>({})
+  const [currentLineNumber, setCurrentLineNumber] = useState<number>(0)
+  const debuggerRef = useRef<any>(null)
+  const editorRef = useRef<any>(null)
 
   useEffect(() => {
     const loadSubject = async () => {
@@ -80,6 +101,7 @@ function InterpretorWithSubject() {
   const handleRunCode = async () => {
     setIsRunning(true)
     setOutput('')
+    setDebugMode(false)
     
     let outputBuffer: string[] = []
     
@@ -106,6 +128,92 @@ function InterpretorWithSubject() {
     } finally {
       setIsRunning(false)
     }
+  }
+
+  const handleStartDebug = () => {
+    try {
+      debuggerRef.current = new StepDebugger(code)
+      setDebugMode(true)
+      setVariables({})
+      setCurrentLineNumber(0)
+      setOutput('// Debug mode: Click "Step In" to execute line by line')
+    } catch (error: any) {
+      setOutput(`// Eroare la inițializare debugger:\n// ${error.message}`)
+    }
+  }
+
+  const handleStepIn = () => {
+    if (!debuggerRef.current) return
+
+    const result = debuggerRef.current.step()
+    
+    setVariables(result.variables)
+    setOutput(result.output || '// No output yet...')
+    setCurrentLineNumber(result.currentLineNumber || 0)
+    
+    // Highlight current line in editor
+    if (editorRef.current && result.currentLineNumber) {
+      highlightLine(result.currentLineNumber)
+    }
+    
+    if (result.finished) {
+      setDebugMode(false)
+      clearHighlight()
+      if (result.error) {
+        setOutput(prev => prev + `\n\n// Eroare: ${result.error}`)
+      } else {
+        setOutput(prev => prev + '\n\n// Program terminat')
+      }
+    }
+  }
+  
+  const highlightLine = (lineNumber: number) => {
+    if (!editorRef.current) return
+    
+    const editor = editorRef.current.getEditor()
+    const monaco = editorRef.current.getMonaco()
+    if (!editor || !monaco) return
+    
+    const decorations = editor.deltaDecorations(
+      editor.debugDecorations || [],
+      [
+        {
+          range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+          options: {
+            isWholeLine: true,
+            className: 'debugger-line-highlight',
+            glyphMarginClassName: 'debugger-line-glyph'
+          }
+        }
+      ]
+    )
+    
+    // Store decorations to clear later
+    editor.debugDecorations = decorations
+    
+    // Scroll to line
+    editor.revealLineInCenter(lineNumber)
+  }
+  
+  const clearHighlight = () => {
+    if (!editorRef.current) return
+    
+    const editor = editorRef.current.getEditor()
+    if (!editor || !editor.debugDecorations) return
+    
+    editor.deltaDecorations(editor.debugDecorations, [])
+    editor.debugDecorations = []
+  }
+
+  const handleResetDebug = () => {
+    if (debuggerRef.current) {
+      debuggerRef.current.reset()
+    }
+    clearHighlight()
+    setDebugMode(false)
+    setVariables({})
+    setCurrentLineNumber(0)
+    setOutput('')
   }
 
   const renderRequirements = () => {
@@ -156,6 +264,7 @@ function InterpretorWithSubject() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <style>{debuggerStyles}</style>
       <Header showLoginButton={false} onNavigateToLanding={() => navigate('/')} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -228,18 +337,46 @@ function InterpretorWithSubject() {
               </div>
             </div>
 
-            <button
-              onClick={handleRunCode}
-              disabled={isRunning}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {isRunning ? 'Se execută...' : 'Rulează codul'}
-            </button>
+            <div className="flex gap-2">
+              {!debugMode ? (
+                <>
+                  <button
+                    onClick={handleRunCode}
+                    disabled={isRunning}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isRunning ? 'Se execută...' : 'Rulează codul'}
+                  </button>
+                  <button
+                    onClick={handleStartDebug}
+                    disabled={isRunning}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Debug Mode
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleStepIn}
+                    className="px-6 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors"
+                  >
+                    Step In {currentLineNumber > 0 && `(Line ${currentLineNumber})`}
+                  </button>
+                  <button
+                    onClick={handleResetDebug}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                  >
+                    Reset
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Editors Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Pseudocode Editor */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="bg-blue-600 text-white px-4 py-3 font-semibold">
@@ -247,6 +384,7 @@ function InterpretorWithSubject() {
             </div>
             <div className="p-4">
               <CodeEditor
+                ref={editorRef}
                 onCodeChange={handleCodeChange}
                 fontSize={fontSize}
                 editorTheme={editorTheme}
@@ -255,6 +393,36 @@ function InterpretorWithSubject() {
               />
             </div>
           </div>
+
+          {/* Variables Panel (Debug Mode) */}
+          {debugMode && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-indigo-600 text-white px-4 py-3 font-semibold">
+                Variabile (Live)
+              </div>
+              <div className="p-4 h-[50vh] overflow-auto">
+                {Object.keys(variables).length === 0 ? (
+                  <p className="text-gray-500 text-sm">Nicio variabilă încă...</p>
+                ) : (
+                  <div className="space-y-2">
+                    {Object.entries(variables).map(([name, varInfo]: [string, any]) => (
+                      <div key={name} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <div className="flex justify-between items-center">
+                          <span className="font-mono font-semibold text-blue-700">{name}</span>
+                          <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">
+                            {typeof varInfo.value === 'string' ? `"${varInfo.value}"` : String(varInfo.value)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Type: {varInfo.type}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* C++ Transpiled Code (Read-only) */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react"
 
 interface CodeEditorProps {
   onCodeChange: (code: string) => void
@@ -11,9 +11,15 @@ interface CodeEditorProps {
   language?: string
 }
 
-const CodeEditor = ({ onCodeChange, fontSize, editorTheme, wordWrap, code, readOnly = false, language = "pseudocode" }: CodeEditorProps) => {
+const CodeEditor = forwardRef(({ onCodeChange, fontSize, editorTheme, wordWrap, code, readOnly = false, language = "pseudocode" }: CodeEditorProps, ref) => {
   const editorRef = useRef<any>(null)
   const [monacoInstance, setMonacoInstance] = useState<any>(null)
+  
+  // Expose editor instance to parent
+  useImperativeHandle(ref, () => ({
+    getEditor: () => editorRef.current,
+    getMonaco: () => monacoInstance
+  }))
 
   function handleEditorMount(editor: any, monacoInstance: any) {
     editorRef.current = editor
@@ -152,6 +158,8 @@ const CodeEditor = ({ onCodeChange, fontSize, editorTheme, wordWrap, code, readO
       />
     </div>
   )
-}
+})
+
+CodeEditor.displayName = 'CodeEditor'
 
 export default CodeEditor
