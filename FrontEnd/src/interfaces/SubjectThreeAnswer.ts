@@ -1,15 +1,14 @@
-interface SubjectThreeAnswer {
-    Ex1:{
-        UserAnswer: string
-        Score: number
-    }
-    Ex2:{
-        UserAnswer: string
-        Score: number
-    }
-    Ex3:{
-        UserAnswer: string
-        Score: number
-    }
+interface SubjectThreeExercise {
+    Sentence?: string
+    Answer?: string
+    UserAnswer?: string
+    Score: number
 }
-export type { SubjectThreeAnswer }
+
+interface SubjectThreeAnswer {
+    Ex1?: SubjectThreeExercise
+    Ex2?: SubjectThreeExercise
+    Ex3?: SubjectThreeExercise
+}
+
+export type { SubjectThreeAnswer, SubjectThreeExercise }

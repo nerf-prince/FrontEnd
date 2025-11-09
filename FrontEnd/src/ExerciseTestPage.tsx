@@ -1,22 +1,21 @@
 import { useState } from 'react'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
-import  buildUserAnswer  from './utils/buildUserAnswer'	
-
-interface StartTestPageProps {
+import buildUserAnswer  from './utils/buildUserAnswer'
+interface ExerciseTestPageProps {
     subject: SubjectData
     onNavigateBack: () => void
     onSubmit?: (answers: any) => void
-    submitting?: boolean
+	submitting?: boolean
 }
 
 // The page renders the subject and a form to collect the user's answers.
 // For Sub1 we render radio options (a/b/c/d) extracted from `Options`.
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
 
-function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartTestPageProps) {
-
-	const [formState, setFormState] = useState<Record<string, any>>({})
+function ExerciseTestPage({ subject, onNavigateBack, onSubmit, submitting }: ExerciseTestPageProps) {
+    
+    const [formState, setFormState] = useState<Record<string, any>>({})
 
 
 	const handleSub1Change = (exerciseKey: string, value: string) => {
@@ -47,19 +46,15 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartT
 
 	const submit = (e: React.FormEvent) => {
 		e.preventDefault()
-		const builtDto = buildUserAnswer(formState, subject)
-		console.log('StartTestPage submit - built Submission DTO:', builtDto)
-		if (onSubmit) {
-			onSubmit(builtDto)
-		} else {
-			console.log('Submitted answers (built locally):', builtDto)
-		}
+		// Build a UserAnswer-shaped JSON with default scores = 0
+		const built = buildUserAnswer(formState, subject)
+		if (onSubmit) onSubmit(built)
+		else console.log('Submitted answers', built)
 	}
 
-	// Convert the internal formState into the UserAnswer JSON shape.
-	// - Sub1 becomes an array of { userAnswer: string, score: 0 }
-	// - Sub2/Sub3 are objects following the shapes in the interfaces with Score default 0
 	
+
+		
 
 	const renderSub1 = (sub: any) => {
 		if (!sub) return null
@@ -134,7 +129,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartT
 											/>
 											<span className="font-medium">{letter}</span>
 											<span className="text-gray-600">{opt}</span>
-										</label>
+											</label>
 									)
 								})}
 							</div>
@@ -168,24 +163,24 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartT
 									{hasParts ? (
 										['a', 'b', 'c', 'd'].map(part =>
 											ex[part] ? (
-												<div key={part}>
-													<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-													<input
-														type="text"
-														value={formState[subKey]?.[exKey]?.[part] || ''}
-														onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
-														className="w-full px-3 py-2 border rounded-lg"
-													/>
-												</div>
-											) : null
+											<div key={part}>
+												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+												<input
+													type="text"
+													value={formState[subKey]?.[exKey]?.[part] || ''}
+													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
+													className="w-full px-3 py-2 border rounded-lg"
+												/>
+											</div>
+										) : null
 										)
 									) : (
-										<textarea
-											rows={3}
-											value={formState[subKey]?.[exKey] || ''}
-											onChange={(e) => handleTextChange(subKey, exKey, null, e.target.value)}
-											className="w-full px-3 py-2 border rounded-lg"
-										/>
+									<textarea
+										rows={3}
+										value={formState[subKey]?.[exKey] || ''}
+										onChange={(e) => handleTextChange(subKey, exKey, null, e.target.value)}
+										className="w-full px-3 py-2 border rounded-lg"
+									/>
 									)}
 								</div>
 							</div>
@@ -217,25 +212,25 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartT
 								{hasParts ? (
 									['a', 'b', 'c', 'd'].map(part =>
 										ex[part] ? (
-											<div key={part}>
-												<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-												<input
-													type="text"
+										<div key={part}>
+											<label className="block text-sm font-medium text-gray-700 mb-1">{`(${part}) ${ex[part].Sentence || ''}`}</label>
+											<input
+												type="text"
 													value={formState[subKey]?.[exKey]?.[part] || ''}
 													onChange={(e) => handleTextChange(subKey, exKey, part, e.target.value)}
 													className="w-full px-3 py-2 border rounded-lg"
 												/>
 											</div>
 										) : null
-									)
-								) : (
+										)
+									) : (
 									<textarea
 										rows={3}
 										value={formState[subKey]?.[exKey] || ''}
 										onChange={(e) => handleTextChange(subKey, exKey, null, e.target.value)}
 										className="w-full px-3 py-2 border rounded-lg"
 									/>
-								)}
+									)}
 							</div>
 						</div>
 					)
@@ -285,17 +280,17 @@ function StartTestPage({ subject, onNavigateBack, onSubmit, submitting }: StartT
 							disabled={!!submitting}
 							className={`px-6 py-3 rounded-xl font-semibold ${submitting ? 'bg-gray-400 text-gray-200' : 'bg-blue-600 text-white'}`}
 						>
-							{submitting ? 'Se trimit...' : 'Trimite răspunsurile'}
+							{ submitting ? 'Se trimit...' : 'Trimite răspunsurile' }
 						</button>
- 
-                         <button type="button" onClick={() => console.log('Preview answers', formState)} className="text-sm text-gray-600">
-                             Preview answers
-                         </button>
-                     </div>
-                 </form>
-             </div>
-         </div>
-     )
- }
- 
- export default StartTestPage
+
+                        <button type="button" onClick={() => console.log('Preview answers', formState)} className="text-sm text-gray-600">
+                            Preview answers
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+export default ExerciseTestPage

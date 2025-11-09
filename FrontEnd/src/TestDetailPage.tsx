@@ -2,6 +2,8 @@ import { useState } from 'react'
 import Header from './Header'
 import StartTestPage from './StartTestPage'
 import type { SubjectData } from './interfaces/SubjectData'
+import ExerciseTestPage from './ExerciseTestPage'
+import buildUserAnswer from './utils/buildUserAnswer'
 
 
 interface TestDetailPageProps {
@@ -13,6 +15,11 @@ interface TestDetailPageProps {
 
 function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDetailPageProps) {
   const [isStartingTest, setIsStartingTest] = useState(false)
+  const [isExerciseTest, setIsExerciseTest] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null)
+  const [lastPayload, setLastPayload] = useState<string | null>(null)
+
 
   const handleStartTest = () => {
     // Open the StartTestPage view
@@ -20,8 +27,8 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
   }
 
   const handlePracticeTest = () => {
+    setIsExerciseTest(true)
     // TODO: Implement practice test functionality
-    console.log('Practice test clicked')
   }
 
   const renderExercise = (exerciseData: any, exerciseKey: string) => {
@@ -85,8 +92,8 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
     if (!subjectData || typeof subjectData !== 'object') return null
 
     // Check if the subject uses the new array structure (Ex array) or old structure (Ex1, Ex2, etc.)
-    const exercises = subjectData.Ex && Array.isArray(subjectData.Ex) 
-      ? subjectData.Ex 
+    const exercises = subjectData.Ex && Array.isArray(subjectData.Ex)
+      ? subjectData.Ex
       : Object.keys(subjectData).filter(key => key.startsWith('Ex')).map(key => subjectData[key])
 
     if (!exercises || exercises.length === 0) return null
@@ -119,14 +126,106 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding }: TestDe
   // If user started the test, render the StartTestPage
   if (isStartingTest) {
     return (
-      <StartTestPage
-        subject={subject}
-        onNavigateBack={() => setIsStartingTest(false)}
-        onSubmit={(answers) => {
-          console.log('Submitted answers', answers)
-          setIsStartingTest(false)
-        }}
-      />
+      <>
+        {submitMessage && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div className="text-center text-sm text-gray-700">{submitMessage}</div>
+          </div>
+        )}
+        <StartTestPage
+          subject={subject}
+          onNavigateBack={() => setIsStartingTest(false)}
+          onSubmit={async (answers) => {
+            console.log('Raw answers (from StartTestPage):', answers)
+            try { console.log('Raw answers (stringified):', JSON.stringify(answers)) } catch {}
+            const dto = answers && answers.Sub1 && Array.isArray(answers.Sub1.Ex)
+              ? answers
+              : buildUserAnswer(answers, subject)
+            console.log('Built submission DTO:', dto)
+            try { setLastPayload(JSON.stringify(dto, null, 2)) } catch {}
+            setSubmitting(true)
+            setSubmitMessage(null)
+            try {
+              const res = await fetch('http://localhost:5262/api/Submission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dto),
+              })
+              const text = await res.text().catch(() => '')
+              let json = null
+              try { json = text ? JSON.parse(text) : null } catch { json = null }
+              if (!res.ok) {
+                console.error('Submission failed', res.status, json ?? text)
+                setSubmitMessage('Submission failed: ' + (json?.title ?? text ?? ''))
+              } else {
+                console.log('Submission successful', json ?? text ?? 'OK')
+                setSubmitMessage('Submission successful')
+                // keep the view open so the user still sees their answers
+              }
+            } catch (err) {
+              console.error('Error sending submission', err)
+              setSubmitMessage('Error sending submission')
+            } finally {
+              setSubmitting(false)
+            }
+          }}
+          submitting={submitting}
+        />
+        {/* Debug: show last payload sent for inspection */}
+        {lastPayload && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Last payload (debug)</h3>
+            <pre className="bg-gray-100 p-3 rounded text-xs whitespace-pre-wrap">{lastPayload}</pre>
+          </div>
+        )}
+      </>
+    )
+  }
+  if (isExerciseTest) {
+    return (
+      <>
+        {submitMessage && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div className="text-center text-sm text-gray-700">{submitMessage}</div>
+          </div>
+        )}
+        <ExerciseTestPage
+          subject={subject}
+          onNavigateBack={() => setIsExerciseTest(false)}
+          onSubmit={async (answers) => {
+            console.log('Raw answers (from ExerciseTestPage):', answers)
+            const dto = answers && answers.Sub1 && Array.isArray(answers.Sub1.Ex)
+              ? answers
+              : buildUserAnswer(answers, subject)
+            console.log('Built submission DTO:', dto)
+            setSubmitting(true)
+            setSubmitMessage(null)
+            try {
+              const res = await fetch('http://localhost:5262/api/Submission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dto),
+              })
+              const text = await res.text().catch(() => '')
+              let json = null
+              try { json = text ? JSON.parse(text) : null } catch { json = null }
+              if (!res.ok) {
+                console.error('Submission failed', res.status, json ?? text)
+                setSubmitMessage('Submission failed: ' + (json?.title ?? text ?? ''))
+              } else {
+                console.log('Submission successful', json ?? text ?? 'OK')
+                setSubmitMessage('Submission successful')
+              }
+            } catch (err) {
+              console.error('Error sending submission', err)
+              setSubmitMessage('Error sending submission')
+            } finally {
+              setSubmitting(false)
+            }
+          }}
+          submitting={submitting}
+        />
+      </>
     )
   }
 
