@@ -376,8 +376,33 @@ function InterpretorWithSubject() {
         </div>
 
         {/* Editors Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Pseudocode Editor */}
+        <div className={`gap-6 mb-6 ${debugMode ? 'grid grid-cols-1 lg:grid-cols-[200px_1fr_1fr]' : 'grid grid-cols-1 lg:grid-cols-2'}`}>
+          {/* Variables Panel (Debug Mode) - First column, narrow */}
+          {debugMode && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-indigo-600 text-white px-3 py-2 font-semibold text-sm">
+                Variabile
+              </div>
+              <div className="p-3 h-[50vh] overflow-auto">
+                {Object.keys(variables).length === 0 ? (
+                  <p className="text-gray-500 text-sm">Nicio variabilă...</p>
+                ) : (
+                  <div className="space-y-2">
+                    {Object.entries(variables).map(([name, varInfo]: [string, any]) => (
+                      <div key={name} className="bg-gray-50 p-2 rounded border border-gray-200">
+                        <div className="font-mono font-semibold text-blue-700 text-sm mb-1">{name}</div>
+                        <div className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300 break-all">
+                          {typeof varInfo.value === 'string' ? `"${varInfo.value}"` : String(varInfo.value)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Pseudocode Editor - Second column */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="bg-blue-600 text-white px-4 py-3 font-semibold">
               Editor Pseudocod
@@ -394,37 +419,7 @@ function InterpretorWithSubject() {
             </div>
           </div>
 
-          {/* Variables Panel (Debug Mode) */}
-          {debugMode && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="bg-indigo-600 text-white px-4 py-3 font-semibold">
-                Variabile (Live)
-              </div>
-              <div className="p-4 h-[50vh] overflow-auto">
-                {Object.keys(variables).length === 0 ? (
-                  <p className="text-gray-500 text-sm">Nicio variabilă încă...</p>
-                ) : (
-                  <div className="space-y-2">
-                    {Object.entries(variables).map(([name, varInfo]: [string, any]) => (
-                      <div key={name} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="font-mono font-semibold text-blue-700">{name}</span>
-                          <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">
-                            {typeof varInfo.value === 'string' ? `"${varInfo.value}"` : String(varInfo.value)}
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Type: {varInfo.type}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* C++ Transpiled Code (Read-only) */}
+          {/* C++ Transpiled Code (Read-only) - Third column */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="bg-orange-600 text-white px-4 py-3 font-semibold">
               Cod C++
