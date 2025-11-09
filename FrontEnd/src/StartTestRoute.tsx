@@ -57,6 +57,7 @@ function StartTestRoute() {
     <StartTestPage
       subject={subject}
       onNavigateBack={() => navigate(`/test/${subjectId}`)}
+      onNavigateToLanding={() => navigate('/')}
       onSubmit={(answers) => {
         console.log('Submitted answers', answers)
         navigate(`/test/${subjectId}`)

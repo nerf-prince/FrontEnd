@@ -19,6 +19,13 @@ function SubjectsList() {
   const [selectedYear, setSelectedYear] = useState<string>('Toate')
   const [selectedSession, setSelectedSession] = useState<string>('Toate')
 
+  const isTestInProgress = (subject: SubjectData) => {
+    const id = getSubjectId(subject)
+    const storageKey = `test-progress-${id}`
+    const timerKey = `test-timer-${id}`
+    return localStorage.getItem(storageKey) !== null || localStorage.getItem(timerKey) !== null
+  }
+
   const handleSubjectClick = (subject: SubjectData) => {
     const id = getSubjectId(subject)
     navigate(`/test/${id}`)
@@ -168,12 +175,27 @@ function SubjectsList() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-gray-100">
-              <button
-                onClick={() => handleSubjectClick(subject)}
-                className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-              >
-                Vezi subiectul →
-              </button>
+              {isTestInProgress(subject) ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-2 text-orange-600 text-sm font-semibold">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></div>
+                    Test în desfășurare
+                  </div>
+                  <button
+                    onClick={() => handleSubjectClick(subject)}
+                    className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Vezi subiectul →
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSubjectClick(subject)}
+                  className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  Vezi subiectul →
+                </button>
+              )}
             </div>
           </div>
         ))}

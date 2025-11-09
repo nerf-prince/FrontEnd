@@ -15,6 +15,13 @@ interface TestDetailPageProps {
 function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
   const navigate = useNavigate()
   
+  const isTestInProgress = () => {
+    const id = getSubjectId(subject)
+    const storageKey = `test-progress-${id}`
+    const timerKey = `test-timer-${id}`
+    return localStorage.getItem(storageKey) !== null || localStorage.getItem(timerKey) !== null
+  }
+  
   const handleStartTest = () => {
     if (onStartTest) onStartTest(subject)
     else console.warn('onStartTest handler not provided')
@@ -170,9 +177,20 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
         <div className="flex flex-col sm:flex-row gap-4 mb-10">
           <button
             onClick={handleStartTest}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform transition-all duration-300"
+            className={`flex-1 font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform transition-all duration-300 ${
+              isTestInProgress() 
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' 
+                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+            }`}
           >
-            Start Test
+            {isTestInProgress() ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                Continuă testul
+              </span>
+            ) : (
+              'Start Test'
+            )}
           </button>
           <button
             onClick={handlePracticeTest}

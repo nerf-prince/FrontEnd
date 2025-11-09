@@ -6,6 +6,7 @@ import type { SubjectData } from './interfaces/SubjectData'
 interface StartTestPageProps {
 	subject: SubjectData
 	onNavigateBack: () => void
+	onNavigateToLanding?: () => void
 	onSubmit?: (answers: any) => void
 }
 
@@ -13,7 +14,7 @@ interface StartTestPageProps {
 // For Sub1 we render radio options (a/b/c/d) extracted from `Options`.
 // For Sub2 and Sub3 we render text inputs / textareas for free text answers.
 
-function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps) {
+function StartTestPage({ subject, onNavigateBack, onNavigateToLanding, onSubmit }: StartTestPageProps) {
 	
 	const getStorageKey = () => {
 		const subjectId = subject._id?.$oid || `${subject.AnScolar}-${subject.Sesiune}`
@@ -85,6 +86,16 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 
 		if (onSubmit) onSubmit(answers)
 		else console.log('Auto-submitted answers (time expired)', answers)
+	}
+
+	const handleCancelTest = () => {
+		if (window.confirm('Sigur vrei să anulezi testul? Tot progresul va fi pierdut.')) {
+			const storageKey = getStorageKey()
+			const timerKey = getTimerKey()
+			localStorage.removeItem(storageKey)
+			localStorage.removeItem(timerKey)
+			onNavigateBack()
+		}
 	}
 
 	const formatTime = (seconds: number) => {
@@ -339,7 +350,7 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-			<Header showLoginButton={false} />
+			<Header showLoginButton={false} onNavigateToLanding={onNavigateToLanding} />
 
 			<div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<button
@@ -356,15 +367,22 @@ function StartTestPage({ subject, onNavigateBack, onSubmit }: StartTestPageProps
 					Completează testul — {subject.AnScolar} · {subject.Sesiune}
 				</h1>
 
-				{/* Timer */}
-				<div className="mb-8 flex justify-center">
-					<div className={`px-6 py-3 rounded-xl font-bold text-2xl ${
+				{/* Timer and Cancel Button */}
+				<div className="mb-8 flex justify-center items-center gap-4">
+					<div className={`px-6 py-3 rounded-xl font-bold text-xl ${
 						timeRemaining < 600 ? 'bg-red-100 text-red-700' : 
 						timeRemaining < 1800 ? 'bg-yellow-100 text-yellow-700' : 
 						'bg-blue-100 text-blue-700'
 					}`}>
-						⏱️ Timp rămas: {formatTime(timeRemaining)}
+						Timp rămas: {formatTime(timeRemaining)}
 					</div>
+					<button
+						type="button"
+						onClick={handleCancelTest}
+						className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold text-xl hover:bg-red-700 transition-colors"
+					>
+						Anulare Test
+					</button>
 				</div>
 
 				<form onSubmit={submit} className="space-y-8">
