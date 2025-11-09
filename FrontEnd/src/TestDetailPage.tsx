@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
+import { getSubjectId } from './utils/subjectLoader'
 
 
 interface TestDetailPageProps {
@@ -10,18 +12,27 @@ interface TestDetailPageProps {
 }
 
 
-function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
+export default function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartTest }: TestDetailPageProps) {
+  const navigate = useNavigate()
+
+  const isTestInProgress = () => {
+    const id = getSubjectId(subject)
+    const storageKey = `test-progress-${id}`
+    const timerKey = `test-timer-${id}`
+    return localStorage.getItem(storageKey) !== null || localStorage.getItem(timerKey) !== null
+  }
+
   const handleStartTest = () => {
     if (onStartTest) onStartTest(subject)
     else console.warn('onStartTest handler not provided')
   }
 
   const handlePracticeTest = () => {
-    // TODO: Implement practice test functionality
-    console.log('Practice test clicked')
+    const id = getSubjectId(subject)
+    navigate(`/practice/${id}`)
   }
 
-  const renderExercise = (exerciseData: any, exerciseKey: string) => {
+  const renderExercise = (exerciseData: any, exerciseKey: string, subjectKey: string, exerciseIndex: number) => {
     // Handle Sub1 exercises with options
     if (exerciseData.options) {
       const options = exerciseData.options.split('$')
@@ -41,6 +52,8 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
 
     // Handle Sub2 exercises with subpoints (a, b, c, d)
     if (exerciseData.a || exerciseData.b || exerciseData.c || exerciseData.d) {
+      const isSubject2Ex1 = subjectKey === 'sub2' && exerciseIndex === 0
+
       return (
         <div key={exerciseKey} className="mb-6">
           {exerciseData.sentence && (
@@ -65,6 +78,20 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
               <p className="text-sm text-gray-600">{exerciseData.d.sentence}</p>
             )}
           </div>
+
+          {isSubject2Ex1 && exerciseData.code && (
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  const subjectId = getSubjectId(subject)
+                  navigate(`/interpretor/${subjectId}`)
+                }}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Deschide în Interpretor
+              </button>
+            </div>
+          )}
         </div>
       )
     }
@@ -78,10 +105,10 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
   }
 
   const renderSubject = (subjectKey: string) => {
-    const subjectData = (subject as any)[subjectKey]
+    const subjectData = subject[subjectKey]
     if (!subjectData || typeof subjectData !== 'object') return null
 
-    // Check if the subject uses the new array structure (ex array) or old structure (ex1, ex2, etc.)
+    // Check if the subject uses the array structure (ex array) or keyed structure (ex1, ex2, etc.)
     const exercises = subjectData.ex && Array.isArray(subjectData.ex)
       ? subjectData.ex
       : Object.keys(subjectData).filter(key => key.startsWith('ex')).map(key => subjectData[key])
@@ -97,14 +124,13 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
         <h2 className="text-2xl font-bold text-gray-900 mb-4">{subjectTitle}</h2>
         <div className="space-y-4">
           {exercises.map((exerciseData: any, index: number) => {
-            // Exercise number is index + 1
             const exerciseNumber = index + 1
             const exerciseTitle = `Exercițiul ${exerciseNumber}`
 
             return (
               <div key={`ex-${index}`} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">{exerciseTitle}</h3>
-                {renderExercise(exerciseData, `ex-${index}`)}
+                {renderExercise(exerciseData, `ex-${index}`, subjectKey, index)}
               </div>
             )
           })}
@@ -112,8 +138,6 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
       </div>
     )
   }
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -123,7 +147,7 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
         {/* Back button */}
         <button
           onClick={onNavigateBack}
-          className="mb-6 flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          className="mb-4 flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
         >
           <svg
             className="w-5 h-5 mr-2"
@@ -150,9 +174,20 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
         <div className="flex flex-col sm:flex-row gap-4 mb-10">
           <button
             onClick={handleStartTest}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform transition-all duration-300"
+            className={`flex-1 font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform transition-all duration-300 ${
+              isTestInProgress()
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
+                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+            }`}
           >
-            Start Test
+            {isTestInProgress() ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                Continuă testul
+              </span>
+            ) : (
+              'Start Test'
+            )}
           </button>
           <button
             onClick={handlePracticeTest}
@@ -170,10 +205,3 @@ function TestDetailPage({ subject, onNavigateBack, onNavigateToLanding, onStartT
     </div>
   )
 }
-
-
-
-export default TestDetailPage
-
-
-

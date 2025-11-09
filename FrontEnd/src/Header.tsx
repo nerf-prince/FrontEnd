@@ -2,16 +2,20 @@ interface HeaderProps {
   onNavigateToLogin?: () => void
   onNavigateBack?: () => void
   onNavigateToLanding?: () => void
+  onNavigateToInterpretor?: () => void
   showLoginButton?: boolean
   showBackButton?: boolean
+  showInterpretorButton?: boolean
 }
 
 function Header({ 
   onNavigateToLogin, 
   onNavigateBack,
-  onNavigateToLanding, 
+  onNavigateToLanding,
+  onNavigateToInterpretor, 
   showLoginButton = false, 
-  showBackButton = false 
+  showBackButton = false,
+  showInterpretorButton = false
 }: HeaderProps) {
   return (
     <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
@@ -35,6 +39,15 @@ function Header({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               ÎNAPOI
+            </button>
+          )}
+
+          {showInterpretorButton && onNavigateToInterpretor && (
+            <button
+              onClick={onNavigateToInterpretor}
+              className="px-6 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 border border-purple-600 rounded-full hover:bg-purple-50 transition-all duration-200"
+            >
+              Interpretor
             </button>
           )}
 

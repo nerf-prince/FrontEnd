@@ -51,6 +51,8 @@ function TestDetailRoute() {
     return <Navigate to="/" replace />
   }
 
+  const subjectId = subject.id || `${subject.AnScolar}-${subject.Sesiune}`
+
   return (
     <TestDetailPage
       subject={subject}
@@ -59,6 +61,9 @@ function TestDetailRoute() {
       onStartTest={(subject) => {
         const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
         navigate(`/start/${subjectId}`)
+      }}
+      onPracticeTest={() => {
+        navigate(`/practice/${subjectId}`)
       }}
     />
   )

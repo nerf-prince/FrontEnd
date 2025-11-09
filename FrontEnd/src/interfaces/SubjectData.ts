@@ -6,6 +6,7 @@ interface SubjectData {
   sub1?: Sub1Data
   sub2?: Sub2Data
   sub3?: Sub3Data
+  [key: string]: any // Allow dynamic property access
 }
 
 interface Sub1Data {

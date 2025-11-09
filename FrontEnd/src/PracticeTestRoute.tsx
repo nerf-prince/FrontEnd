@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Navigate } from 'react-router-dom'
 import { loadSubjectById } from './utils/subjectLoader'
-import StartTestPage from './StartTestPage'
+import PracticeTestPage from './PracticeTestPage'
+import type { SubjectData } from './interfaces/SubjectData'
 
-interface SubjectData {
-  id: string
-  anScolar: string
-  sesiune: string
-  [key: string]: any
-}
-
-function StartTestRoute() {
+function PracticeTestRoute() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [subject, setSubject] = useState<SubjectData | null>(null)
@@ -54,16 +48,17 @@ function StartTestRoute() {
   const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
 
   return (
-    <StartTestPage
+    <PracticeTestPage
       subject={subject}
       onNavigateBack={() => navigate(`/test/${subjectId}`)}
-      onNavigateToLanding={() => navigate('/')}
-      onSubmit={(answers) => {
-        console.log('Submitted answers', answers)
+      onSubmit={(answers: any) => {
+        console.log('Practice test answers submitted:', answers)
+        // Navigate back to test details after submission
         navigate(`/test/${subjectId}`)
       }}
     />
   )
 }
 
-export default StartTestRoute
+export default PracticeTestRoute
+

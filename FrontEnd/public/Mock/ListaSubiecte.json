@@ -1,0 +1,376 @@
+[
+    {
+    "_id": {
+        "$oid": "690f73c39a166437b5eb8a10"
+    },
+    "Sub1": {
+        "Ex":[ 
+            {
+            "Sentence": "Intrebare 1",
+            "QuestionNumber": 1,
+            "Answer": "a",
+            "Options": "Raspuns 1$Raspuns 2$Raspuns 3$Raspuns 4"
+            },
+            {
+            "Sentence": "Intrebare 2 (Sub1 Ex2)",
+            "QuestionNumber": 2,
+            "Answer": "c",
+            "Options": "Optiunea A$Optiunea B$Optiunea C$Optiunea D"
+            }
+        ]
+    },
+    "Sub2": {
+        "Ex1": {
+        "Code": "int n = 5;\nfor(int i=0; i<n; i++) {\n  // ...\n}",
+        "Sentence": "Enunt Subiect 2, Ex 1: Se da urmatorul cod:",
+        "a": {
+            "Sentence": "Subpunct a) Ce valoare are 'n'?",
+            "Answer": "5"
+        },
+        "b": {
+            "Sentence": "Subpunct b) De cate ori se executa bucla?",
+            "Answer": "De 5 ori"
+        },
+        "c": {
+            "Sentence": "Subpunct c) Rescrieti algoritmul in pseudocod.",
+            "Answer": "n <- 5\npentru i <- 0, n-1 executa\n  // ..."
+        },
+        "d": {
+            "Sentence": "Subpunct d) Care este complexitatea?",
+            "Answer": "O(n)"
+        }
+        },
+        "Ex2": {
+        "Sentence": "Enunt Subiect 2, Ex 2: Definiti structura 'stiva'.",
+        "Answer": "Stiva este o structura de date LIFO (Last In, First Out)."
+        },
+        "Ex3": {
+        "Sentence": "Enunt Subiect 2, Ex 3: Desenati un graf neorientat cu 5 noduri.",
+        "Answer": "// Aici ar putea fi un link catre o imagine sau o descriere text"
+        }
+    },
+    "Sub3": {
+        "Ex1": {
+        "Sentence": "Enunt Subiect 3, Ex 1: Cititi din 'bac.in' si scrieti in 'bac.out'...",
+        "Answer": "// Solutia completa C++ pentru Sub3 Ex1\n#include <iostream>\n..."
+        },
+        "Ex2": {
+        "Sentence": "Enunt Subiect 3, Ex 2: Problema de backtracking.",
+        "Answer": "// Solutia completa C++ pentru Sub3 Ex2 (Backtracking)\n..."
+        },
+        "Ex3": {
+        "Sentence": "Enunt Subiect 3, Ex 3: Problema cu liste inlantuite.",
+        "Answer": "// Solutia completa C++ pentru Sub3 Ex3 (Liste)\n..."
+        }
+    },
+    "AnScolar": "2025",
+    "Sesiune": "Toamna"
+    },
+    {
+    "_id": {
+        "$oid": "690f73c39a166437b5eb8a11"
+    },
+    "Sub1": {
+        "Ex": [
+            {
+                "Sentence": "Intrebare 1",
+                "QuestionNumber": 1,
+                "Answer": "a",
+                "Options": "Raspuns 1$Raspuns 2$Raspuns 3$Raspuns 4"
+            },
+            {
+                "Sentence": "Intrebare 2 (Sub1 Ex2)",
+                "QuestionNumber": 2,
+                "Answer": "c",
+                "Options": "Optiunea A$Optiunea B$Optiunea C$Optiunea D"
+            }
+        ]
+    },
+    "Sub2": {
+        "Ex": [
+            {
+                "Code": "int n = 5;\nfor(int i=0; i<n; i++) {\n  // ...\n}",
+                "Sentence": "Enunt Subiect 2, Ex 1: Se da urmatorul cod:",
+                "a": {
+                    "Sentence": "Subpunct a) Ce valoare are 'n'?",
+                    "Answer": "5"
+                },
+                "b": {
+                    "Sentence": "Subpunct b) De cate ori se executa bucla?",
+                    "Answer": "De 5 ori"
+                },
+                "c": {
+                    "Sentence": "Subpunct c) Rescrieti algoritmul in pseudocod.",
+                    "Answer": "n <- 5\npentru i <- 0, n-1 executa\n  // ..."
+                },
+                "d": {
+                    "Sentence": "Subpunct d) Care este complexitatea?",
+                    "Answer": "O(n)"
+                }
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 2: Definiti structura 'stiva'.",
+                "Answer": "Stiva este o structura de date LIFO (Last In, First Out)."
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 3: Desenati un graf neorientat cu 5 noduri.",
+                "Answer": "// Aici ar putea fi un link catre o imagine sau o descriere text"
+            }
+        ]
+    },
+    "Sub3": {
+        "Ex": [
+            {
+                "Sentence": "Enunt Subiect 3, Ex 1: Cititi din 'bac.in' si scrieti in 'bac.out'...",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex1\n#include <iostream>\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 2: Problema de backtracking.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex2 (Backtracking)\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 3: Problema cu liste inlantuite.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex3 (Liste)\n..."
+            }
+        ]
+    },
+    "AnScolar": "2025",
+    "Sesiune": "Vara"
+    },
+        {
+    "_id": {
+        "$oid": "690f73c39a166437b5eb8a12"
+    },
+    "Sub1": {
+        "Ex": [
+            {
+                "Sentence": "Intrebare 1",
+                "QuestionNumber": 1,
+                "Answer": "a",
+                "Options": "Raspuns 1$Raspuns 2$Raspuns 3$Raspuns 4"
+            },
+            {
+                "Sentence": "Intrebare 2 (Sub1 Ex2)",
+                "QuestionNumber": 2,
+                "Answer": "c",
+                "Options": "Optiunea A$Optiunea B$Optiunea C$Optiunea D"
+            }
+        ]
+    },
+    "Sub2": {
+        "Ex": [
+            {
+                "Code": "int n = 5;\nfor(int i=0; i<n; i++) {\n  // ...\n}",
+                "Sentence": "Enunt Subiect 2, Ex 1: Se da urmatorul cod:",
+                "a": {
+                    "Sentence": "Subpunct a) Ce valoare are 'n'?",
+                    "Answer": "5"
+                },
+                "b": {
+                    "Sentence": "Subpunct b) De cate ori se executa bucla?",
+                    "Answer": "De 5 ori"
+                },
+                "c": {
+                    "Sentence": "Subpunct c) Rescrieti algoritmul in pseudocod.",
+                    "Answer": "n <- 5\npentru i <- 0, n-1 executa\n  // ..."
+                },
+                "d": {
+                    "Sentence": "Subpunct d) Care este complexitatea?",
+                    "Answer": "O(n)"
+                }
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 2: Definiti structura 'stiva'.",
+                "Answer": "Stiva este o structura de date LIFO (Last In, First Out)."
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 3: Desenati un graf neorientat cu 5 noduri.",
+                "Answer": "// Aici ar putea fi un link catre o imagine sau o descriere text"
+            }
+        ]
+    },
+    "Sub3": {
+        "Ex": [
+            {
+                "Sentence": "Enunt Subiect 3, Ex 1: Cititi din 'bac.in' si scrieti in 'bac.out'...",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex1\n#include <iostream>\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 2: Problema de backtracking.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex2 (Backtracking)\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 3: Problema cu liste inlantuite.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex3 (Liste)\n..."
+            }
+        ]
+    },
+    "AnScolar": "2024",
+    "Sesiune": "Toamna"
+    },
+    {
+    "_id": {
+        "$oid": "690f73c39a166437b5eb8a13"
+    },
+    "Sub1": {
+        "Ex": [
+            {
+                "Sentence": "Intrebare 1",
+                "QuestionNumber": 1,
+                "Answer": "a",
+                "Options": "Raspuns 1$Raspuns 2$Raspuns 3$Raspuns 4"
+            },
+            {
+                "Sentence": "Intrebare 2 (Sub1 Ex2)",
+                "QuestionNumber": 2,
+                "Answer": "c",
+                "Options": "Optiunea A$Optiunea B$Optiunea C$Optiunea D"
+            }
+        ]
+    },
+    "Sub2": {
+        "Ex": [
+            {
+                "Code": "int n = 5;\nfor(int i=0; i<n; i++) {\n  // ...\n}",
+                "Sentence": "Enunt Subiect 2, Ex 1: Se da urmatorul cod:",
+                "a": {
+                    "Sentence": "Subpunct a) Ce valoare are 'n'?",
+                    "Answer": "5"
+                },
+                "b": {
+                    "Sentence": "Subpunct b) De cate ori se executa bucla?",
+                    "Answer": "De 5 ori"
+                },
+                "c": {
+                    "Sentence": "Subpunct c) Rescrieti algoritmul in pseudocod.",
+                    "Answer": "n <- 5\npentru i <- 0, n-1 executa\n  // ..."
+                },
+                "d": {
+                    "Sentence": "Subpunct d) Care este complexitatea?",
+                    "Answer": "O(n)"
+                }
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 2: Definiti structura 'stiva'.",
+                "Answer": "Stiva este o structura de date LIFO (Last In, First Out)."
+            },
+            {
+                "Sentence": "Enunt Subiect 2, Ex 3: Desenati un graf neorientat cu 5 noduri.",
+                "Answer": "// Aici ar putea fi un link catre o imagine sau o descriere text"
+            }
+        ]
+    },
+    "Sub3": {
+        "Ex": [
+            {
+                "Sentence": "Enunt Subiect 3, Ex 1: Cititi din 'bac.in' si scrieti in 'bac.out'...",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex1\n#include <iostream>\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 2: Problema de backtracking.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex2 (Backtracking)\n..."
+            },
+            {
+                "Sentence": "Enunt Subiect 3, Ex 3: Problema cu liste inlantuite.",
+                "Answer": "// Solutia completa C++ pentru Sub3 Ex3 (Liste)\n..."
+            }
+        ]
+    },
+    "AnScolar": "2022",
+    "Sesiune": "Vara"
+    },
+
+    {
+      "_id": {"$oid": "generated_id_var4_2024"},
+
+      "Sub1": {
+        "Ex": [
+          {
+            "Sentence": "1. Variabilele x și y sunt reale. Indicați o expresie echivalentă cu !(x>25 || y<6).",
+            "QuestionNumber": 1,
+            "Answer": "a",
+            "Options": "x<=25 && y>=6$x<=25 || y>=6$x<=25 && y<6$x<=25 || y<6"
+          },
+          {
+            "Sentence": "2. Indicați ce se afișează în urma apelului f(9). \n void f(int x)\n{ if(x%5!=0)\n{ x=x*5/2; f(x);}\nelse x=x-1;\ncout<<x; | printf(\"%d\",x);\n} \n",
+            "QuestionNumber": 2,
+            "Answer": "c",
+            "Options": "225554$545522$55109$92255"
+          },
+          {
+            "Sentence": "3. Două soluții: una înainte de SV-68-CAB și una după SV-68-CAB.",
+            "QuestionNumber": 3,
+            "Answer": "d",
+            "Options": "MM-68-CAB, SV-86-BAC$SV-46-CAB, TL-24-BAC$SV-48-BAC, SV-68-BAC$SV-68-BAC, TL-24-BAC"
+          },
+          {
+            "Sentence": "4. Indicați expresia care accesează anul achiziționării telefonului t.",
+            "QuestionNumber": 4,
+            "Answer": "d",
+            "Options": "telefon.an$t.data.an$telefon.achizitionare.data.an$t.achizitionare.an"
+          },
+          {
+            "Sentence": "5. Indicați lungimea maximă a unui drum elementar într-un graf orientat cu 5 vârfuri.",
+            "QuestionNumber": 5,
+            "Answer": "b",
+            "Options": "10$8$4$3"
+          }
+        ]
+      },
+
+      "Sub2": {
+        "Ex1": {
+          "Code": "citeşte n\n(număr natural, n≥2)\ni<-1\n┌cât timp i≤n execută\n│ m<-i\n│┌cât timp m%2=0 execută\n││ m<-[m/2]\n│└■\n│┌dacă m≠i atunci\n││ scrie m,’ ’\n│└■\n│ i<-i+1\n└■",
+          "Sentence": "Subiectul 2, Ex 1: Algoritmul alăturat este reprezentat în pseudocod.\nS-a notat cu a%b restul împărţirii numărului natural a la numărul natural\nnenul b şi cu [c] partea întreagă a numărului real c.",
+          "a": {
+            "Sentence": "a) Ce se afișează pentru n=10?",
+            "Answer": "1 3 1 5 1 3 1 7 1 9"
+          },
+          "b": {
+            "Sentence": "b) Două valori pentru care se afișează exact 4 valori egale cu 1.",
+            "Answer": "8 și 9"
+          },
+          "c": {
+            "Sentence": "c) Program C/C++ corespunzător algoritmului.",
+            "Answer": "#include <iostream>\nusing namespace std;\nint main(){\n    int n; cin>>n;\n    for(int i=1;i<=n;i++){\n        int m=i;\n        while(m%2==0) m/=2;\n        if(m!=i) cout<<m<<\" \";\n    }\n    return 0;\n}"
+          },
+          "d": {
+            "Sentence": "d) Rescrieți algoritmul folosind pentru...execută.",
+            "Answer": "citește n\ndacă n≥2 atunci\n  pentru i←1,n execută\n    m←i\n    cât timp m%2=0 execută\n       m←[m/2]\n    dacă m≠i atunci scrie m,' '\n  sfârșit pentru"
+          }
+        },
+
+        "Ex2": {
+          "Sentence": "Un graf neorientat cu 6 noduri, numerotate de la 1 la 6, are muchiile [1,2], [2,3], [2,4], [2,5], [4,5],\n[4,6], [5,6]. Scrieţi listele de adiacenţă ale unui graf parţial al său care să fie conex și fără cicluri. ",
+          "Answer": "Un arbore posibil:\n1: 2\n2: 1 3 4\n3: 2\n4: 2 5\n5: 4 6\n6: 5"
+        },
+
+        "Ex3": {
+          "Sentence": "Subiectul 2, Ex 3: Determinați dacă există un cuvânt format din 2 litere cu o vocală și o consoană.",
+          "Answer": "c=0;\nfor(i=1;i<=10;i++){\n  cin>>s;\n  if(strlen(s)==2){\n     int v=0,cns=0;\n     for(int j=0;j<2;j++)\n        if(strchr(\"aeiou\",s[j])) v=1; else cns=1;\n     if(v && cns) c=1;\n  }\n}"
+        }
+      },
+
+      "Sub3": {
+        "Ex1": {
+          "Sentence": "Subiectul 3, Ex 1: Subprogramul fulg(n).",
+          "Answer": "// returnează 1 dacă n are exact 9 cifre și câte cel puțin una din {1,2,3,4}\nint fulg(int n){\n    int cnt[5]={0}; int k=0;\n    if(n<100000000 || n>999999999) return 0;\n    while(n){ cnt[n%10]++; n/=10; k++; }\n    if(k!=9) return 0;\n    for(int i=1;i<=4;i++) if(cnt[i]==0) return 0;\n    return 1;\n}"
+        },
+
+        "Ex2": {
+          "Sentence": "Subiectul 3, Ex 2: Tablou m×n cu cea mai mică valoare generată.",
+          "Answer": "#include <iostream>\nusing namespace std;\nlong long genMin(int a,int b){\n    // a urmat de cifrele lui b\n    long long x=a;\n    int bb=b, p=1;\n    while(bb){ p*=10; bb/=10; }\n    long long v1 = x * p + b;\n\n    // cifrele lui b urmate de a\n    long long v2 = b;\n    int aa=a, q=1;\n    while(aa){ q*=10; aa/=10; }\n    v2 = v2 * q + a;\n\n    return min(v1,v2);\n}\nint main(){\n    int m,n; cin>>m>>n;\n    for(int i=1;i<=m;i++){\n        for(int j=1;j<=n;j++){\n            cout<<genMin(i,j)<<\" \";\n        }\n        cout<<\"\\n\";\n    }\n}"
+        },
+
+        "Ex3": {
+          "Sentence": "Subiectul 3, Ex 3: Primul și ultimul număr cu cifra maximă din fișier.",
+          "Answer": "a) Algoritm:\n - Parcurg fișierul o singură dată.\n - Determin cifra maximă apărută în oricare număr.\n - Reiau parcurgerea (sau memorez primele și ultimele poziții în aceeași parcurgere) și găsesc primul și ultimul număr care conține cifra maximă.\n - Afișez numerele sau „nu exista”.\n\nb) Cod C++:\n#include <iostream>\n#include <fstream>\nusing namespace std;\n\nint maxDigit(int x){ int m=0; if(x==0) return 0;\n  while(x){ m=max(m,x%10); x/=10; }\n  return m;\n}\n\nint main(){\n    ifstream f(\"numere.in\");\n    int x;\n    int globalMax=-1;\n    int v[1000005]; int k=0;\n\n    while(f>>x){ v[k++]=x; globalMax=max(globalMax,maxDigit(x)); }\n\n    int first=-1,last=-1;\n    for(int i=0;i<k;i++){\n        if(maxDigit(v[i])==globalMax){\n            if(first==-1) first=v[i];\n            last=v[i];\n        }\n    }\n\n    if(first==-1 || last==-1 || (first==last && k==1)) cout<<\"nu exista\";\n    else cout<<first<<\" \"<<last;\n}\n"
+        }
+      },
+
+      "AnScolar": "2024",
+      "Sesiune": "BAC",
+      "Varianta": "4"
+    }
+
+]
