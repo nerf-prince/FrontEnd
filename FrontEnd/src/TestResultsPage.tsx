@@ -187,18 +187,19 @@ function TestResultsPage({ submittedAnswers }: TestResultsPageProps) {
               <div className="mt-3 space-y-2 text-sm">
                 <div className="bg-gray-50 p-3 rounded">
                   <p className="font-semibold text-gray-700">Răspunsul tău:</p>
-                  <p className="text-gray-900 mt-1">{ex.UserAnswer || '-'}</p>
+                  <p className="text-gray-900 mt-1 whitespace-pre-wrap">{ex.UserAnswer || '-'}</p>
                 </div>
                 
                 <div className="bg-blue-50 p-3 rounded">
-                  <p className="font-semibold text-blue-700">Răspuns corect:</p>
-                  <p className="text-gray-900 mt-1">{ex.Answer || 'N/A'}</p>
+                  <p className="font-semibold text-blue-700">Barem (Răspuns corect):</p>
+                  <p className="text-gray-900 mt-1 whitespace-pre-wrap">{ex.Answer || 'N/A'}</p>
                 </div>
 
-                {ex.AIFeedback && (
-                  <div className="bg-purple-50 p-3 rounded">
-                    <p className="font-semibold text-purple-700">🤖 Feedback AI:</p>
-                    <p className="text-gray-900 mt-1">{ex.AIFeedback}</p>
+                {ex.AIEvaluated && (
+                  <div className="bg-purple-50 p-3 rounded text-center">
+                    <p className="text-purple-700 text-xs">
+                      🤖 Evaluat automat cu inteligență artificială
+                    </p>
                   </div>
                 )}
               </div>
@@ -249,18 +250,19 @@ function TestResultsPage({ submittedAnswers }: TestResultsPageProps) {
               <div className="mt-3 space-y-2 text-sm">
                 <div className="bg-gray-50 p-3 rounded">
                   <p className="font-semibold text-gray-700">Răspunsul tău:</p>
-                  <p className="text-gray-900 mt-1">{ex.UserAnswer || '-'}</p>
+                  <p className="text-gray-900 mt-1 whitespace-pre-wrap">{ex.UserAnswer || '-'}</p>
                 </div>
                 
                 <div className="bg-blue-50 p-3 rounded">
-                  <p className="font-semibold text-blue-700">Răspuns corect:</p>
-                  <p className="text-gray-900 mt-1">{ex.Answer || 'N/A'}</p>
+                  <p className="font-semibold text-blue-700">Barem (Răspuns corect):</p>
+                  <p className="text-gray-900 mt-1 whitespace-pre-wrap">{ex.Answer || 'N/A'}</p>
                 </div>
 
-                {ex.AIFeedback && (
-                  <div className="bg-purple-50 p-3 rounded">
-                    <p className="font-semibold text-purple-700">🤖 Feedback AI:</p>
-                    <p className="text-gray-900 mt-1">{ex.AIFeedback}</p>
+                {ex.AIEvaluated && (
+                  <div className="bg-purple-50 p-3 rounded text-center">
+                    <p className="text-purple-700 text-xs">
+                      🤖 Evaluat automat cu inteligență artificială
+                    </p>
                   </div>
                 )}
               </div>

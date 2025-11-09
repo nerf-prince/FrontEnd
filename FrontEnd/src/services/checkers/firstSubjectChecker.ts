@@ -10,63 +10,57 @@ async function evaluateWithAI(
   exerciseData: any,
   userAnswer: string,
   maxPoints: number
-): Promise<{ score: number; feedback: string }> {
+): Promise<number> {
   try {
-    const prompt = `Ești un evaluator pentru bacalaureatul la informatică. Evaluează următorul răspuns:
+    const prompt = `Ești un evaluator strict pentru bacalaureatul la informatică.
 
 ENUNȚ: ${exerciseData.Sentence || 'N/A'}
 ${exerciseData.Code ? `\nCOD:\n${exerciseData.Code}\n` : ''}
 
-RĂSPUNS CORECT: ${exerciseData.Answer || 'N/A'}
+BAREM (Răspuns corect): ${exerciseData.Answer || 'N/A'}
 
-RĂSPUNS ELEV: ${userAnswer}
+SOLUȚIE ELEV: ${userAnswer}
 
 PUNCTAJ MAXIM: ${maxPoints} puncte
 
-Evaluează răspunsul elevului comparativ cu răspunsul corect. 
-- Dacă răspunsul este complet corect sau foarte aproape: acordă punctajul maxim
-- Dacă răspunsul este parțial corect: acordă punctaj proporțional (de ex. 50-80%)
-- Dacă răspunsul este greșit sau complet diferit: acordă 0 puncte
+Analizează soluția elevului comparativ cu baremul și acordă un punctaj între 0 și ${maxPoints}.
+- Complet corect sau foarte aproape de barem: ${maxPoints} puncte
+- Parțial corect (50-80% din cerințe): ${Math.floor(maxPoints * 0.5)}-${Math.floor(maxPoints * 0.8)} puncte
+- Greșit sau foarte diferit: 0 puncte
 
-Răspunde EXACT în formatul JSON:
-{
-  "score": <număr_puncte>,
-  "feedback": "<explicație_scurtă_în_română>"
-}`;
+IMPORTANT: Răspunde DOAR cu un singur număr întreg (punctajul), fără niciun alt text, explicație sau JSON.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "Ești un evaluator obiectiv. Răspunde DOAR cu JSON valid, fără text suplimentar."
+          content: "Ești un evaluator obiectiv. Răspunde DOAR cu un singur număr întreg reprezentând punctajul. Nimic altceva."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.2,
-      max_tokens: 300
+      temperature: 0.1,
+      max_tokens: 10
     });
 
-    const responseText = completion.choices[0]?.message?.content || '{"score": 0, "feedback": "Eroare la evaluare"}';
+    const responseText = completion.choices[0]?.message?.content?.trim() || '0';
     
-    // Parse JSON response
-    try {
-      const result = JSON.parse(responseText);
-      return {
-        score: Math.min(Math.max(0, result.score), maxPoints), // Ensure score is within bounds
-        feedback: result.feedback || 'N/A'
-      };
-    } catch {
-      // If JSON parsing fails, try to extract score from text
-      console.warn('Failed to parse AI response, defaulting to 0');
-      return { score: 0, feedback: 'Eroare la parsarea răspunsului AI' };
+    // Parse the number from response
+    const score = parseInt(responseText, 10);
+    
+    if (isNaN(score)) {
+      console.warn('AI returned non-numeric value:', responseText);
+      return 0;
     }
+    
+    // Ensure score is within bounds
+    return Math.min(Math.max(0, score), maxPoints);
   } catch (error) {
     console.error('Error evaluating with AI:', error);
-    return { score: 0, feedback: 'Eroare la evaluarea cu AI' };
+    return 0;
   }
 }
 
@@ -88,12 +82,12 @@ export async function firstSubjectChecker(userAnswer: any) {
         for (const ex of userAnswer.Sub2.Ex) {
             ex.Points = 10  // Set max points for each exercise
             if (ex.UserAnswer && ex.UserAnswer.trim() !== '') {
-                const evaluation = await evaluateWithAI(ex, ex.UserAnswer, 10);
-                ex.Score = evaluation.score;
-                ex.AIFeedback = evaluation.feedback;
+                const score = await evaluateWithAI(ex, ex.UserAnswer, 10);
+                ex.Score = score;
+                ex.AIEvaluated = true;
             } else {
                 ex.Score = 0;
-                ex.AIFeedback = 'Răspuns lipsă';
+                ex.AIEvaluated = false;
             }
         }
     }
@@ -103,12 +97,12 @@ export async function firstSubjectChecker(userAnswer: any) {
         for (const ex of userAnswer.Sub3.Ex) {
             ex.Points = 15  // Set max points for each exercise
             if (ex.UserAnswer && ex.UserAnswer.trim() !== '') {
-                const evaluation = await evaluateWithAI(ex, ex.UserAnswer, 15);
-                ex.Score = evaluation.score;
-                ex.AIFeedback = evaluation.feedback;
+                const score = await evaluateWithAI(ex, ex.UserAnswer, 15);
+                ex.Score = score;
+                ex.AIEvaluated = true;
             } else {
                 ex.Score = 0;
-                ex.AIFeedback = 'Răspuns lipsă';
+                ex.AIEvaluated = false;
             }
         }
     }
