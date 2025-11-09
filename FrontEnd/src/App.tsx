@@ -4,6 +4,7 @@ import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
 import TestDetailRoute from './TestDetailRoute'
 import StartTestRoute from './StartTestRoute'
+import PracticeTestRoute from './PracticeTestRoute'
 import InterpretorPage from './InterpretorPage'
 import InterpretorWithSubject from './InterpretorWithSubject'
 
@@ -51,6 +52,7 @@ function App() {
 
       <Route path="/test/:id" element={<TestDetailRoute />} />
       <Route path="/start/:id" element={<StartTestRoute />} />
+      <Route path="/practice/:id" element={<PracticeTestRoute />} />
       <Route path="/interpretor" element={<InterpretorPage onNavigateBack={navigateToLanding} />} />
       <Route path="/interpretor/:id" element={<InterpretorWithSubject />} />
 

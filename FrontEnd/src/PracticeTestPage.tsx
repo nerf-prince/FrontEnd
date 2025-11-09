@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from './Header'
 import type { SubjectData } from './interfaces/SubjectData'
 import { generateExplanation, generatePseudocodeInterpreter, type ExerciseContext } from './utils/openaiHelper'
 import { TextWithNewlines, CodeWithNewlines } from './utils/TextWithNewlines'
+import { getSubjectId } from './utils/subjectLoader'
 
 interface PracticeTestPageProps {
 	subject: SubjectData
@@ -11,6 +13,7 @@ interface PracticeTestPageProps {
 }
 
 function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPageProps) {
+	const navigate = useNavigate()
 	const [showExplanation, setShowExplanation] = useState<string | null>(null)
 	const [explanationText, setExplanationText] = useState<string>('')
 	const [loadingExplanation, setLoadingExplanation] = useState<boolean>(false)
@@ -291,17 +294,27 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPag
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 							<div className="flex justify-between items-start mb-2">
 								<h3 className="text-lg font-semibold">{`Exercițiul ${idx + 1}`}</h3>
-								<button
-									type="button"
-									onClick={(e) => showExplanationPopup(subKey, exKey, e)}
-									className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-										showExplanation === `${subKey}-${exKey}` 
-											? (isSub2Ex1 ? 'bg-purple-600 text-white' : 'bg-green-600 text-white')
-											: (isSub2Ex1 ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
-									}`}
-								>
-								{isSub2Ex1 ? '🔧 Deschide interpretorul de pseudocod' : '💡 Explicație'}
-							</button>
+								{isSub2Ex1 ? (
+									<button
+										type="button"
+										onClick={() => navigate(`/interpretor/${getSubjectId(subject)}`)}
+										className="px-3 py-1 rounded-lg text-sm font-medium transition-colors bg-purple-500 hover:bg-purple-600 text-white"
+									>
+										🔧 Deschide interpretorul de pseudocod
+									</button>
+								) : (
+									<button
+										type="button"
+										onClick={(e) => showExplanationPopup(subKey, exKey, e)}
+										className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+											showExplanation === `${subKey}-${exKey}` 
+												? 'bg-green-600 text-white'
+												: 'bg-green-500 hover:bg-green-600 text-white'
+										}`}
+									>
+										💡 Explicație
+									</button>
+								)}
 						</div>
 		{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
 			<CodeWithNewlines code={ex.Code} />
@@ -312,19 +325,6 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPag
 							<div key={part}>
 								<div className="flex justify-between items-start mb-1">
 									<label className="block text-sm font-medium text-gray-700">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-									{isSub2Ex1 && (
-										<button
-											type="button"
-											onClick={(e) => showExplanationPopup(subKey, `${exKey}-${part}${part === 'd' ? '-interpreter' : ''}`, e)}
-											className={`px-2 py-1 rounded text-xs font-medium transition-colors ml-2 ${
-												showExplanation === `${subKey}-${exKey}-${part}${part === 'd' ? '-interpreter' : ''}`
-													? (part === 'd' ? 'bg-purple-600 text-white' : 'bg-green-600 text-white')
-													: (part === 'd' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
-											}`}
-										>
-											{part === 'd' ? '🔧 Deschide interpretorul de pseudocod' : '💡 Explicație'}
-										</button>
-									)}
 								</div>
 								{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
 									<textarea
@@ -374,17 +374,27 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPag
 						<div key={exKey} className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
 							<div className="flex justify-between items-start mb-2">
 								<h3 className="text-lg font-semibold">{`Exercițiul ${exKey.replace('Ex', '')}`}</h3>
-								<button
-									type="button"
-									onClick={(e) => showExplanationPopup(subKey, exKey, e)}
-									className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-										showExplanation === `${subKey}-${exKey}`
-											? (isSub2Ex1 ? 'bg-purple-600 text-white' : 'bg-green-600 text-white')
-											: (isSub2Ex1 ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
-									}`}
-								>
-							{isSub2Ex1 ? '🔧 Deschide interpretorul de pseudocod' : '💡 Explicație'}
-						</button>
+								{isSub2Ex1 ? (
+									<button
+										type="button"
+										onClick={() => navigate(`/interpretor/${getSubjectId(subject)}`)}
+										className="px-3 py-1 rounded-lg text-sm font-medium transition-colors bg-purple-500 hover:bg-purple-600 text-white"
+									>
+										🔧 Deschide interpretorul de pseudocod
+									</button>
+								) : (
+									<button
+										type="button"
+										onClick={(e) => showExplanationPopup(subKey, exKey, e)}
+										className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+											showExplanation === `${subKey}-${exKey}`
+												? 'bg-green-600 text-white'
+												: 'bg-green-500 hover:bg-green-600 text-white'
+										}`}
+									>
+										💡 Explicație
+									</button>
+								)}
 				</div>
 	{ex.Sentence && <TextWithNewlines text={ex.Sentence} className="text-sm text-gray-700 mb-3" />}
 	<CodeWithNewlines code={ex.Code} />
@@ -396,19 +406,6 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPag
 					<div key={part}>
 						<div className="flex justify-between items-start mb-1">
 							<label className="block text-sm font-medium text-gray-700">{`(${part}) ${ex[part].Sentence || ''}`}</label>
-							{isSub2Ex1 && (
-									<button
-										type="button"
-										onClick={(e) => showExplanationPopup(subKey, `${exKey}-${part}${part === 'd' ? '-interpreter' : ''}`, e)}
-										className={`px-2 py-1 rounded text-xs font-medium transition-colors ml-2 ${
-											showExplanation === `${subKey}-${exKey}-${part}${part === 'd' ? '-interpreter' : ''}`
-												? (part === 'd' ? 'bg-purple-600 text-white' : 'bg-green-600 text-white')
-												: (part === 'd' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
-										}`}
-									>
-										{part === 'd' ? '🔧 Deschide interpretorul de pseudocod' : '💡 Explicație'}
-									</button>
-								)}
 							</div>
 							{subKey === 'Sub2' && (part === 'c' || part === 'd') ? (
 								<textarea
@@ -516,7 +513,7 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit }: PracticeTestPag
 			<div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<button
 					onClick={onNavigateBack}
-					className="mb-6 flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+					className="mb-4 flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
 				>
 					<svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

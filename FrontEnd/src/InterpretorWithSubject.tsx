@@ -268,6 +268,27 @@ function InterpretorWithSubject() {
       <Header showLoginButton={false} onNavigateToLanding={() => navigate('/')} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(`/practice/${id}`)}
+          className="mb-4 flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors"
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Înapoi la exerciții practice
+        </button>
+
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Interpretor Pseudocod - Subiect 2, Ex 1
