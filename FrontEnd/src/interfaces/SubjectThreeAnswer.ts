@@ -1,15 +1,16 @@
 interface SubjectThreeAnswer {
-    Ex1:{
-        UserAnswer: string
-        Score: number
+    ex1: {
+        userAnswer: string
+        score: number
     }
-    Ex2:{
-        UserAnswer: string
-        Score: number
+    ex2: {
+        userAnswer: string
+        score: number
     }
-    Ex3:{
-        UserAnswer: string
-        Score: number
+    ex3: {
+        userAnswer: string
+        score: number
     }
 }
+
 export type { SubjectThreeAnswer }

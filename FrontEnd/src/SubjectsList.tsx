@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getSubjectId } from './utils/subjectLoader'
+import { getSubjectId, loadAllSubjects } from './utils/subjectLoader'
 
 interface SubjectData {
-  _id?: { $oid: string }
-  AnScolar: string
-  Sesiune: string
+  id: string
+  anScolar: string
+  sesiune: string
   [key: string]: any
 }
 
@@ -27,23 +27,15 @@ function SubjectsList() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await fetch('/Mock/ListaSubiecte.json')
-        if (!response.ok) {
-          throw new Error('Failed to fetch subjects')
-        }
-        const data = await response.json()
-        
-        // Verifică dacă data este array sau obiect singular
-        if (Array.isArray(data)) {
-          setSubjects(data)
-          setFilteredSubjects(data)
-        } else {
-          // Dacă e obiect singular, wrapa-l într-un array
-          setSubjects([data])
-          setFilteredSubjects([data])
-        }
+        console.log('SubjectsList: Fetching subjects...')
+        const data = await loadAllSubjects()
+        console.log('SubjectsList: Received data:', data)
+        console.log('SubjectsList: Number of subjects:', data.length)
+        setSubjects(data)
+        setFilteredSubjects(data)
         setLoading(false)
       } catch (err) {
+        console.error('SubjectsList: Error fetching subjects:', err)
         setError(err instanceof Error ? err.message : 'Unknown error')
         setLoading(false)
       }
@@ -54,21 +46,25 @@ function SubjectsList() {
 
   // Filtrare când se schimbă dropdown-urile
   useEffect(() => {
+    console.log('SubjectsList: Filtering subjects...', { selectedYear, selectedSession, totalSubjects: subjects.length })
     let filtered = subjects
 
     if (selectedYear !== 'Toate') {
-      filtered = filtered.filter(subject => subject.AnScolar === selectedYear)
+      filtered = filtered.filter(subject => subject.anScolar === selectedYear)
+      console.log(`SubjectsList: After year filter (${selectedYear}):`, filtered.length)
     }
 
     if (selectedSession !== 'Toate') {
-      filtered = filtered.filter(subject => subject.Sesiune === selectedSession)
+      filtered = filtered.filter(subject => subject.sesiune === selectedSession)
+      console.log(`SubjectsList: After session filter (${selectedSession}):`, filtered.length)
     }
 
+    console.log('SubjectsList: Final filtered count:', filtered.length)
     setFilteredSubjects(filtered)
   }, [selectedYear, selectedSession, subjects])
 
   // Extrage ani unici din subjects
-  const uniqueYears = ['Toate', ...Array.from(new Set(subjects.map(s => s.AnScolar)))]
+  const uniqueYears = ['Toate', ...Array.from(new Set(subjects.map(s => s.anScolar)))]
   const sessions = ['Toate', 'Toamna', 'Vara', 'Sesiune Speciala', 'Model']
 
   if (loading) {
@@ -146,7 +142,7 @@ function SubjectsList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSubjects.map((subject) => (
           <div
-            key={subject._id?.$oid || subject.AnScolar + subject.Sesiune}
+            key={subject.id || subject.anScolar + subject.sesiune}
             className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 cursor-pointer hover:scale-[1.01] transform transition-all duration-300"
           >
             <div className="mb-4">
@@ -158,12 +154,12 @@ function SubjectsList() {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500 font-medium">An Școlar</p>
-                <p className="text-2xl font-bold text-gray-900">{subject.AnScolar}</p>
+                <p className="text-2xl font-bold text-gray-900">{subject.anScolar}</p>
               </div>
               
               <div>
                 <p className="text-sm text-gray-500 font-medium">Sesiune</p>
-                <p className="text-lg font-semibold text-blue-600">{subject.Sesiune}</p>
+                <p className="text-lg font-semibold text-blue-600">{subject.sesiune}</p>
               </div>
             </div>
 
