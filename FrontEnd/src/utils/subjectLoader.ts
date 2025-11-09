@@ -6,7 +6,7 @@ interface SubjectData {
 }
 
 // Direct URL to backend API
-const API_BASE_URL = 'https://localhost:7024/api'
+const API_BASE_URL = 'https://backend.nerfprince.soare.io/api'
 const FALLBACK_JSON = '/Mock/ListaSubiecte.json'
 
 let cachedSubjects: SubjectData[] | null = null
