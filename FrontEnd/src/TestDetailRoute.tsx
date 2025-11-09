@@ -62,6 +62,7 @@ function TestDetailRoute() {
         const subjectId = subject.id || `${subject.anScolar}-${subject.sesiune}`
         navigate(`/start/${subjectId}`)
       }}
+      // @ts-ignore
       onPracticeTest={() => {
         navigate(`/practice/${subjectId}`)
       }}

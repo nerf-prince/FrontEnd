@@ -134,6 +134,7 @@ function PracticeTestPage({ subject, onNavigateBack, onSubmit, userId = '' }: Pr
 					exerciseData = sub.ex[idx]
 					exerciseNumber = idx + 1
 				} else {
+                                        // @ts-ignore
 					exerciseData = sub?.[exKey]
 					exerciseNumber = parseInt(exKey.replace('ex', ''))
 				}
